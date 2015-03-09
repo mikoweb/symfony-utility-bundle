@@ -1,0 +1,25 @@
+{
+    "name": "mikoweb/vsymfo-core-bundle",
+    "type": "symfony-bundle",
+    "description": "vSymfo Core Bundle",
+    "homepage": "http://vision-web.pl",
+    "license": "CC-BY-NC-ND",
+    "authors": [
+        {
+            "name": "Rafał Mikołajun",
+            "email": "rafal@vision-web.pl",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "mikoweb/vsymfo-core": "dev-master",
+        "symfony/framework-bundle": "~2.1"
+    },
+    "autoload": {
+        "psr-0": { "vSymfo\\Bundle\\CoreBundle\\": "" }
+    },
+    "target-dir": "vSymfo/Bundle/CoreBundle",
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
