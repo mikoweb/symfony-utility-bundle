@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Rozszerzenie bundla LiipThemeBundle o możliwość grupowania motywów.
  * Na przykład: panel administracyjny powinien mieć osobny motyw graficzny.
  * W tym celu w rutingu trzeba umieścić wpis: option.theme_group: nazwa_grupy.
- * Zostanie wtedy załadowany szablon o nazwie: nazwa_grupy_ + container->getParameter('app_core.theme_' + nazwa_grupy)
+ * Zostanie wtedy załadowany szablon o nazwie: nazwa_grupy_ + container->getParameter('vsymfo_core.theme_' + nazwa_grupy)
  *
  * @author Rafał Mikołajun <rafal@vision-web.pl>
  * @package vSymfo Core Bundle
@@ -70,7 +70,7 @@ class ThemeGroupListener
 
         if (!empty($route) && $route->hasOption('theme_group'))  {
             $group = $route->getOption('theme_group');
-            $this->theme->setName($group . '_' . $this->container->getParameter('app_core.theme_' . $group));
+            $this->theme->setName($group . '_' . $this->container->getParameter('vsymfo_core.theme_' . $group));
         }
     }
 }
