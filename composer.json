@@ -16,7 +16,8 @@
         "mikoweb/vsymfo-core": "dev-master",
         "symfony/framework-bundle": "~2.1",
         "friendsofsymfony/jsrouting-bundle": "1.5.3",
-        "codeconsortium/ccdn-user-security-bundle": "dev-master"
+        "codeconsortium/ccdn-user-security-bundle": "dev-master",
+        "liip/theme-bundle": "1.1.0"
     },
     "autoload": {
         "psr-0": { "vSymfo\\Bundle\\CoreBundle\\": "" }
