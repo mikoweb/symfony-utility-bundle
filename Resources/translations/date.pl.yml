@@ -1,0 +1,41 @@
+date:
+  month:
+    january: styczeń
+    february: luty
+    march: marzec
+    april: kwiecień
+    may: maj
+    june: czerwiec
+    july: lipiec
+    august: dierpień
+    september: wrzesień
+    october: październik
+    november: listopad
+    december: grudzień
+    jan: Sty
+    feb: Lut
+    mar: Mar
+    apr: Kwi
+    may: Maj
+    jun: Cze
+    jul: Lip
+    aug: Sie
+    sep: Wrz
+    oct: Paź
+    nov: Lis
+    dec: Gru
+  day:
+    sunday: niedziela
+    monday: poniedziałek
+    tuesday: wtorek
+    wednesday: środa
+    thursday: czwartek
+    friday: piątek
+    saturday: sobota
+    sun: N
+    mon: Pn
+    tue: Wt
+    wed: Śr
+    thu: Cz
+    fri: Pt
+    sat: So

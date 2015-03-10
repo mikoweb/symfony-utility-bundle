@@ -14,7 +14,9 @@
     "require": {
         "php": ">=5.3.3",
         "mikoweb/vsymfo-core": "dev-master",
-        "symfony/framework-bundle": "~2.1"
+        "symfony/framework-bundle": "~2.1",
+        "friendsofsymfony/jsrouting-bundle": "1.5.3",
+        "codeconsortium/ccdn-user-security-bundle": "dev-master"
     },
     "autoload": {
         "psr-0": { "vSymfo\\Bundle\\CoreBundle\\": "" }
