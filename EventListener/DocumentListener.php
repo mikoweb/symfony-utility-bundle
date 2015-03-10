@@ -87,7 +87,7 @@ class DocumentListener
                     $doc = new Format\TxtDocument();
             }
 
-            $params = $this->container->getParameter("app_core.document");
+            $params = $this->container->getParameter("vsymfo_core.document");
             $r = new ReflectionClass('vSymfo\Component\Document\Format\DocumentAbstract');
             $mode = $r->getConstant("TITLE_" . strtoupper($params["title_mode"]));
             $doc->name($params["sitename"]);

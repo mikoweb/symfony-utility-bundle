@@ -181,7 +181,7 @@ class UtilitiesExtension extends \Twig_Extension
      */
     public function cdnAsset($path, $type = 'image')
     {
-        $params = $this->container->getParameter('app_core.document');
+        $params = $this->container->getParameter('vsymfo_core.document');
         $asset = $this->container->get('templating.helper.assets');
 
         if (!$params['cdn_enable']) {
