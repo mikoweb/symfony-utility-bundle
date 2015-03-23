@@ -16,6 +16,13 @@ services:
         tags:
             - { name: twig.extension }
 
+    # ten listener jest po to żeby dla zaplecza dało się stworzyć osobny motyw
+    vsymfo_core.event.listener.themegroup:
+        class: vSymfo\Bundle\CoreBundle\EventListener\ThemeGroupListener
+        arguments: [@service_container]
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
     # implementacja dokumentu, domyślnie html ale format i tak będzie zależał od parametru _format w urlu
     # więcej informacji w klasie DocumentListener
     document:
@@ -24,13 +31,6 @@ services:
     # tworzenie usługi dokumentu po otrzymaniu parametru _format z routera
     vsymfo_core.event.listener.document:
         class: vSymfo\Bundle\CoreBundle\EventListener\DocumentListener
-        arguments: [@service_container]
-        tags:
-            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
-
-    # ten listener jest po to żeby dla zaplecza dało się stworzyć osobny motyw
-    vsymfo_core.event.listener.themegroup:
-        class: vSymfo\Bundle\CoreBundle\EventListener\ThemeGroupListener
         arguments: [@service_container]
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
