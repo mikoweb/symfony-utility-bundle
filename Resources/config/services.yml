@@ -21,7 +21,7 @@ services:
         class: vSymfo\Bundle\CoreBundle\EventListener\ThemeGroupListener
         arguments: [@service_container]
         tags:
-            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 2 }
 
     # implementacja dokumentu, domyślnie html ale format i tak będzie zależał od parametru _format w urlu
     # więcej informacji w klasie DocumentListener
@@ -33,7 +33,7 @@ services:
         class: vSymfo\Bundle\CoreBundle\EventListener\DocumentListener
         arguments: [@service_container]
         tags:
-            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 1 }
 
     # usługa przechwytuje niektóre wyjątki i decyduje co ma być wyświetlone
     vsymfo_core.event.listener.exception:
