@@ -173,6 +173,7 @@ final class HtmlDocumentSetup implements DocumentSetupInterface
                         "translations" => $translations,
                         "timeout" => (int)$params['resources_loading_timeout'],
                         "css_callback_timeout" => (int)$params['css_callback_timeout'],
+                        "theme_name" => $container->get('liip_theme.active_theme')->getName(),
                         "path" => array(
                             "base" => $path->url("base"),
                             "theme" => $path->url("web_theme"),
