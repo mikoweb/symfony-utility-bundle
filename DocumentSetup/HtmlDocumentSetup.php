@@ -165,7 +165,7 @@ final class HtmlDocumentSetup implements DocumentSetupInterface
         $twig = $container->get('twig');
         $jsloaderPath = $jsloader->render('array');
         $jsloaderPath = $jsloaderPath['resources']['jsloader'][0]['url'][0];
-        $this->doc->setScriptOutput(function (JavaScriptResourceManager $manager, array $translations) use($jsloaderPath, $params, $script, $twig, $path) {
+        $this->doc->setScriptOutput(function (JavaScriptResourceManager $manager, array $translations) use($container, $jsloaderPath, $params, $script, $twig, $path) {
                 $output = '<script src="' . $jsloaderPath . '" type="text/javascript"></script>';
                 $output .= '<script type="text/javascript">';
                 $output .= $twig->render('::head.js.twig', array(
