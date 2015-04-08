@@ -39,12 +39,32 @@ class DocumentListener
     protected $router;
 
     /**
-     * @param ContainerInterface $container
+     * Wymuszenie formatu dokumentu na sztywno
+     * @var string|null
      */
-    public function __construct(ContainerInterface $container)
+    protected $forceFormat = null;
+
+    /**
+     * Nazwa usługi do zapisania
+     * @var string
+     */
+    protected $serviceName = 'document';
+
+    /**
+     * @param ContainerInterface $container
+     * @param string|null $forceFormat
+     * @param string $serviceName
+     */
+    public function __construct(ContainerInterface $container, $forceFormat = null, $serviceName = 'document')
     {
+        if (!is_string($serviceName)) {
+            throw new \InvalidArgumentException('serviceName is not string');
+        }
+
         $this->container = $container;
         $this->router = $container->get('router');
+        $this->forceFormat = is_string($forceFormat) ? $forceFormat : null;
+        $this->serviceName = $serviceName;
     }
 
     /**
@@ -52,16 +72,26 @@ class DocumentListener
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
-        $request = $event->getRequest();
-        $collection = $this->router->getRouteCollection();
-        $route = $collection->get($request->get('_route'));
-        if (empty($route)) {
-            $route = $collection->get($request->get('_locale'). '__RG__'. $request->get('_route'));
+        $format = null;
+
+        if (is_string($this->forceFormat)) {
+            $format = $this->forceFormat;
+        } else {
+            $request = $event->getRequest();
+            $collection = $this->router->getRouteCollection();
+            $route = $collection->get($request->get('_route'));
+
+            if (empty($route)) {
+                $route = $collection->get($request->get('_locale'). '__RG__'. $request->get('_route'));
+            }
+
+            if (!empty($route))  {
+                $defaultFormat = is_null($route->getDefault('_format')) ? 'html' : $route->getDefault('_format');
+                $format = !is_null($request->get('_format')) ? $request->get('_format') : $defaultFormat;
+            }
         }
 
-        if (!empty($route))  {
-            $defaultFormat = is_null($route->getDefault('_format')) ? 'html' : $route->getDefault('_format');
-            $format = !is_null($request->get('_format')) ? $request->get('_format') : $defaultFormat;
+        if (!is_null($format))  {
             switch ($format) {
                 case 'html':
                     $doc = new Format\HtmlDocument();
@@ -94,7 +124,7 @@ class DocumentListener
             $doc->title($params["title_default"], $mode, $params["title_separator"]);
             $doc->keywords($params["keywords"]);
             $doc->description($params["description"]);
-            $this->container->set('document', $doc);
+            $this->container->set($this->serviceName, $doc);
         }
     }
 }

@@ -41,3 +41,8 @@ services:
         arguments: [@service_container]
         tags:
             - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
+
+    # kontroler obsługi wyjątków
+    vsymfo_core.twig.exception_controller:
+        class: vSymfo\Bundle\CoreBundle\Controller\ExceptionController
+        arguments: [ "@twig", "%kernel.debug%", "@service_container" ]
