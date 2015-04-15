@@ -198,7 +198,7 @@ class UtilitiesExtension extends \Twig_Extension
                 break;
             case 'image':
             default:
-                $domain = $params['cdn_css'];
+                $domain = $params['cdn_image'];
         }
 
         if (empty($domain)) {
