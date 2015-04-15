@@ -180,6 +180,9 @@ final class HtmlDocumentSetup implements DocumentSetupInterface
                             "webui" => $path->url("webui"),
                             "webui_engine" => $path->url("webui_engine"),
                             "resources" => $path->url("web_resources"),
+                            "cdn_javascript" => $params['cdn_enable'] ? $params['cdn_javascript'] : '',
+                            "cdn_css" => $params['cdn_enable'] ? $params['cdn_css'] : '',
+                            "cdn_image" => $params['cdn_enable'] ? $params['cdn_image'] : '',
                         )
                     ));
                 $output .= '</script>';
