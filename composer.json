@@ -18,7 +18,7 @@
         "mikoweb/ccdn-user-security-bundle": "0.1",
         "liip/theme-bundle": "1.1.0",
         "mikoweb/vsymfo-core": "dev-master",
-        "mikoweb/vsymfo-document": "~0.9.0"
+        "mikoweb/vsymfo-document": "~0.9.1"
     },
     "autoload": {
         "psr-0": { "vSymfo\\Bundle\\CoreBundle\\": "" }
