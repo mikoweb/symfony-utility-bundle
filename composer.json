@@ -13,7 +13,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/framework-bundle": "~2.1",
+        "symfony/framework-bundle": ">=2.1",
         "friendsofsymfony/jsrouting-bundle": "1.5.3",
         "mikoweb/ccdn-user-security-bundle": "0.1",
         "liip/theme-bundle": "1.1.0",
