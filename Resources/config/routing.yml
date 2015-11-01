@@ -1,6 +1,6 @@
 vsymfo_core_webui_css:
     path:     /resources/webui-css/{name}/{theme}
     defaults:
-      _controller: vSymfoBundleCoreBundle:Resources:webuiCss
+        _controller: vSymfoBundleCoreBundle:Resources:webuiCss
     options:
         expose: true
