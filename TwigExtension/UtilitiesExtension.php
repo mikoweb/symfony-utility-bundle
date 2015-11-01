@@ -71,18 +71,20 @@ class UtilitiesExtension extends \Twig_Extension
     public function limitWords($text, $limit = 3, $stripTags = true, $append = '...', $separator = ' ')
     {
         $words = explode($separator, $stripTags ? strip_tags($text) : $text);
-        $i = 1;
-        $result = '';
-        foreach($words as $word)
-        {
-            $result .= $word;
-            if ($i >= $limit) {
-                $result .= $append;
-                break;
-            }
+        $count = count($words);
 
-            $result .= $separator;
-            $i++;
+        $i = 0;
+        $result = '';
+
+        while ($i < $limit && $i < $count) {
+            $result .= $words[$i] . $separator;
+            ++$i;
+        }
+
+        $result = substr($result, 0, -strlen($separator));
+
+        if ($limit < $count) {
+            $result .= $append;
         }
 
         return $result;
