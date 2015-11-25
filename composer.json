@@ -14,9 +14,9 @@
     "require": {
         "php": ">=5.3.3",
         "symfony/framework-bundle": "~2.1",
-        "friendsofsymfony/jsrouting-bundle": "1.5.3",
+        "friendsofsymfony/jsrouting-bundle": "~1.5.4",
         "mikoweb/ccdn-user-security-bundle": "0.1.1",
-        "liip/theme-bundle": "1.1.0",
+        "liip/theme-bundle": "~1.3.0",
         "mikoweb/vsymfo-core": "dev-master",
         "mikoweb/vsymfo-document": "~0.9.1"
     },
