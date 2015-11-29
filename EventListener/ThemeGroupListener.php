@@ -12,6 +12,7 @@
 
 namespace vSymfo\Bundle\CoreBundle\EventListener;
 
+use JMS\I18nRoutingBundle\Router\I18nRouter;
 use Liip\ThemeBundle\ActiveTheme;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -62,10 +63,17 @@ class ThemeGroupListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        $collection = $this->router->getOriginalRouteCollection();
+
+        if ($this->router instanceof I18nRouter) {
+            $collection = $this->router->getOriginalRouteCollection();
+        } else {
+            $collection = $this->router->getRouteCollection();
+        }
+
         $route = $collection->get($request->get('_route'));
+
         if (empty($route)) {
-            $route = $collection->get($request->get('_locale').'__RG__'.$request->get('_route'));
+            $route = $collection->get($request->get('_locale') . '__RG__' . $request->get('_route'));
         }
 
         if (!empty($route) && $route->hasOption('theme_group'))  {
