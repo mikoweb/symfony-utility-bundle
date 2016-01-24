@@ -146,14 +146,6 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-                ->arrayNode('login_admin_shield_route_login')
-                    ->children()
-                        ->scalarNode('name')->end()
-                        ->arrayNode('params')
-                            ->prototype('scalar')->end()
-                        ->end()
-                    ->end()
-                ->end()
             ->end()
         ;
 
