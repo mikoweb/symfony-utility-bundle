@@ -103,6 +103,7 @@ class ResourcesController extends Controller
      */
     private function cssFilename($name)
     {
+        $path = $this->container->get('app_path');
         $nameInfo = pathinfo($name);
         $basePath = null;
         $baseUrl = null;
@@ -131,7 +132,7 @@ class ResourcesController extends Controller
         }
 
         $mainInfo = pathinfo($json['main_css']);
-        if (in_array($mainInfo['extension'], ['scss', 'less', 'css'])) {
+        if (!in_array($mainInfo['extension'], ['scss', 'less', 'css'])) {
             throw new NotFoundHttpException('Invalid main css extension');
         }
 
