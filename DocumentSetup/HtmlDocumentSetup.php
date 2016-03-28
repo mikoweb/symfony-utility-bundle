@@ -44,40 +44,59 @@ final class HtmlDocumentSetup implements DocumentSetupInterface
 
     /**
      * @param ApplicationPaths $path
+     *
+     * @return array
+     */
+    public static function getPreprocessorData(ApplicationPaths $path)
+    {
+        return [
+            'variables' => [
+                'path-base'         => '"' . $path->url('base') . '"',
+                'path-theme'        => '"' . $path->url('web_theme') . '"',
+                'path-resources'    => '"' . $path->url('web_resources') . '"',
+                'path-webui'        => '"' . $path->url('webui') . '"',
+                'path-webui-engine' => '"' . $path->url('webui_engine') . '"',
+            ],
+            'import_dirs' => [
+                $path->absolute("web_theme") . $path::WEB_RESOURCES  . '/' => $path->url('web_theme')  . '/',
+                $path->absolute("web_resources") . '/' => $path->url('web_theme')  . '/',
+            ],
+        ];
+    }
+
+    /**
+     * @param ApplicationPaths $path
      * @param string $env
      * @param array $params
      * @param array $custom
+     *
      * @return HtmlResourcesUtility
      */
     public static function getUtility(ApplicationPaths $path, $env, array $params, array $custom = array())
     {
+        $preprocessorData = self::getPreprocessorData($path);
+
         return new HtmlResourcesUtility(array_merge(
-                array(
-                    'cache_dir'      => $path->absolute("kernel_cache") . "/vsymfo_document/resources",
-                    'cache_refresh'  => $env == "dev",
-                    'cache_lifetime' => $params["resources_cache_lifetime"],
-                    'web_dir'        => $path->absolute("web"),
-                    'web_url'        => $path->url("web"),
-                    'web_cache_dir'  => $path->absolute("web_cache") . "/" . $path->getThemeName(),
-                    'web_cache_url'  => $path->url("web_cache") . "/" . $path->getThemeName(),
-                    'less_import_dirs' => array(
-                        $path->absolute("web_theme") . $path::WEB_RESOURCES  . '/' => $path->url('web_theme')  . '/',
-                        $path->absolute("web_resources") . '/' => $path->url('web_theme')  . '/',
-                    ),
-                    'less_globasls' => array(
-                        'path-base'      => '"' . $path->url('base') . '"',
-                        'path-theme'     => '"' . $path->url('web_theme') . '"',
-                        'path-resources' => '"' . $path->url('web_resources') . '"',
-                        'path-webui'     => '"' . $path->url('webui') . '"',
-                        'path-webui-engine' => '"' . $path->url('webui_engine') . '"',
-                    ),
-                    'versioning_enable'    => $params["versioning_enable"],
-                    'versioning_version'   => $params["versioning_version"],
-                    'versioning_timestamp' => $params["versioning_timestamp"],
-                    'cdn_enable'     => $params["cdn_enable"],
-                    'cdn_javascript' => $params["cdn_javascript"],
-                    'cdn_css'        => $params["cdn_css"],
-                ), $custom));
+            array(
+                'cache_dir'      => $path->absolute("kernel_cache") . "/vsymfo_document/resources",
+                'cache_db_dir'   => $path->absolute("kernel_cache") . '/../document/' . $path->getThemeName(),
+                'cache_refresh'  => $env == "dev",
+                'cache_lifetime' => $params["resources_cache_lifetime"],
+                'web_dir'        => $path->absolute("web"),
+                'web_url'        => $path->url("web"),
+                'web_cache_dir'  => $path->absolute("web_cache") . "/" . $path->getThemeName(),
+                'web_cache_url'  => $path->url("web_cache") . "/" . $path->getThemeName(),
+                'less_import_dirs' => $preprocessorData['import_dirs'],
+                'less_variables'   => $preprocessorData['variables'],
+                'scss_import_dirs' => $preprocessorData['import_dirs'],
+                'scss_variables'   => $preprocessorData['variables'],
+                'versioning_enable'    => $params["versioning_enable"],
+                'versioning_version'   => $params["versioning_version"],
+                'versioning_timestamp' => $params["versioning_timestamp"],
+                'cdn_enable'     => $params["cdn_enable"],
+                'cdn_javascript' => $params["cdn_javascript"],
+                'cdn_css'        => $params["cdn_css"],
+            ), $custom));
     }
 
     /**
