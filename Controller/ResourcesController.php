@@ -56,18 +56,19 @@ class ResourcesController extends Controller
         $path = $this->container->get('app_path');
 
         $preprocessorData = HtmlDocumentSetup::getPreprocessorData($path);
-        $preprocessorImportVariables = array_merge($preprocessorData['variables'], ['domain-path' => '""']);
+        $preprocessorImportVariables = $preprocessorData['variables'];
         $preprocessorImportDirs = [
             $path->absolute("web_theme") . $path::WEB_WEBUI . '/' => $path->url('web_theme')  . '/',
             $path->absolute("webui") . '/' => $path->url('web_theme')  . '/',
             $path->absolute("web_theme") . $path::WEB_RESOURCES  . '/' => $path->url('web_theme')  . '/',
             $path->absolute("web_resources") . '/' => $path->url('web_theme')  . '/',
+            $path->absolute("web") . '/' => $path->url('web_theme')  . '/',
         ];
 
         $utility = HtmlDocumentSetup::getUtility($path, $this->container->get('kernel')->getEnvironment(), $params, array(
             'less_import_dirs' => $preprocessorImportDirs,
             'less_variables'   => $preprocessorImportVariables,
-            'scss_import_dirs' => $preprocessorImportDirs,
+            'scss_import_dirs' => array_keys($preprocessorImportDirs),
             'scss_variables'   => $preprocessorImportVariables,
         ));
 

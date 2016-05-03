@@ -60,6 +60,7 @@ final class HtmlDocumentSetup implements DocumentSetupInterface
             'import_dirs' => [
                 $path->absolute("web_theme") . $path::WEB_RESOURCES  . '/' => $path->url('web_theme')  . '/',
                 $path->absolute("web_resources") . '/' => $path->url('web_theme')  . '/',
+                $path->absolute("web") . '/' => $path->url('web_theme')  . '/',
             ],
         ];
     }
@@ -88,7 +89,7 @@ final class HtmlDocumentSetup implements DocumentSetupInterface
                 'web_cache_url'  => $path->url("web_cache") . "/" . $path->getThemeName(),
                 'less_import_dirs' => $preprocessorData['import_dirs'],
                 'less_variables'   => $preprocessorData['variables'],
-                'scss_import_dirs' => $preprocessorData['import_dirs'],
+                'scss_import_dirs' => array_keys($preprocessorData['import_dirs']),
                 'scss_variables'   => $preprocessorData['variables'],
                 'versioning_enable'    => $params["versioning_enable"],
                 'versioning_version'   => $params["versioning_version"],
@@ -185,47 +186,47 @@ final class HtmlDocumentSetup implements DocumentSetupInterface
         $jsloaderPath = $jsloader->render('array');
         $jsloaderPath = $jsloaderPath['resources']['jsloader'][0]['url'][0];
         $this->doc->setScriptOutput(function (JavaScriptResourceManager $manager, array $translations) use($container, $jsloaderPath, $params, $script, $twig, $path) {
-                $output = '<script src="' . $jsloaderPath . '" type="text/javascript"></script>';
-                $output .= '<script type="text/javascript">';
-                $output .= $twig->render('::head.js.twig', array(
-                        "resources" => $manager->render('array'),
-                        "translations" => $translations,
-                        "timeout" => (int)$params['resources_loading_timeout'],
-                        "css_callback_timeout" => (int)$params['css_callback_timeout'],
-                        "theme_name" => $container->get('liip_theme.active_theme')->getName(),
-                        "path" => array(
-                            "base" => $path->url("base"),
-                            "theme" => $path->url("web_theme"),
-                            "webui" => $path->url("webui"),
-                            "webui_engine" => $path->url("webui_engine"),
-                            "resources" => $path->url("web_resources"),
-                            "cdn_javascript" => $params['cdn_enable'] ? $params['cdn_javascript'] : '',
-                            "cdn_css" => $params['cdn_enable'] ? $params['cdn_css'] : '',
-                            "cdn_image" => $params['cdn_enable'] ? $params['cdn_image'] : '',
-                        )
-                    ));
-                $output .= '</script>';
-                if (!$script->isEmpty()) {
-                    $output .= '<script type="text/javascript">' . $script->render() . '</script>';
-                    $script->update(function ()  {
-                            return '';
-                        });
-                }
-                return $output;
-            });
+            $output = '<script src="' . $jsloaderPath . '" type="text/javascript"></script>';
+            $output .= '<script type="text/javascript">';
+            $output .= $twig->render('::head.js.twig', array(
+                "resources" => $manager->render('array'),
+                "translations" => $translations,
+                "timeout" => (int)$params['resources_loading_timeout'],
+                "css_callback_timeout" => (int)$params['css_callback_timeout'],
+                "theme_name" => $container->get('liip_theme.active_theme')->getName(),
+                "path" => array(
+                    "base" => $path->url("base"),
+                    "theme" => $path->url("web_theme"),
+                    "webui" => $path->url("webui"),
+                    "webui_engine" => $path->url("webui_engine"),
+                    "resources" => $path->url("web_resources"),
+                    "cdn_javascript" => $params['cdn_enable'] ? $params['cdn_javascript'] : '',
+                    "cdn_css" => $params['cdn_enable'] ? $params['cdn_css'] : '',
+                    "cdn_image" => $params['cdn_enable'] ? $params['cdn_image'] : '',
+                )
+            ));
+            $output .= '</script>';
+            if (!$script->isEmpty()) {
+                $output .= '<script type="text/javascript">' . $script->render() . '</script>';
+                $script->update(function ()  {
+                    return '';
+                });
+            }
+            return $output;
+        });
 
         // tłumaczenia używane w motywie graficznym
         if (file_exists($path->absolute("kernel_root") . '/theme/' . $path->getThemeName() . '/translations.yml')) {
             $trans = $container->get('translator');
             $locator = new FileLocator($path->absolute("kernel_root") . '/theme/' . $path->getThemeName());
             $loader = new TranslationLoader($locator, array(
-                    'cache_dir' => $path->absolute("kernel_cache") . "/vsymfo_document/translations",
-                    'cache_refresh' => $container->get('kernel')->getEnvironment() == "dev",
-                    'document' => $this->doc,
-                    'trans_closure' => function ($text) use($trans) {
-                        return $trans->trans($text);
-                    }
-                ));
+                'cache_dir' => $path->absolute("kernel_cache") . "/vsymfo_document/translations",
+                'cache_refresh' => $container->get('kernel')->getEnvironment() == "dev",
+                'document' => $this->doc,
+                'trans_closure' => function ($text) use($trans) {
+                    return $trans->trans($text);
+                }
+            ));
             $loader->load('translations.yml');
         }
     }
