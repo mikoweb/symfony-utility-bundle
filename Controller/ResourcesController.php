@@ -92,6 +92,12 @@ class ResourcesController extends Controller
         $response->setContent(file_get_contents($source));
         $response->headers->set('Content-Type', 'text/css');
 
+        if ($this->get('kernel')->getEnvironment() === 'prod') {
+            $date = new \DateTime();
+            $date->modify('+1 week');
+            $response->setExpires($date);
+        }
+
         return $response;
     }
 
