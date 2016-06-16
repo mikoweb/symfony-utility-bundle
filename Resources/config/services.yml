@@ -2,12 +2,12 @@ services:
     # klasa do pobierania adresów ścieżek
     app_path:
         class: vSymfo\Core\ApplicationPaths
-        arguments: [@service_container]
+        arguments: ["@service_container"]
 
     # rozszerzenia twig
     vsymfo_core.twig.utilities:
         class: vSymfo\Bundle\CoreBundle\TwigExtension\UtilitiesExtension
-        arguments: [@service_container]
+        arguments: ["@service_container"]
         tags:
             - { name: twig.extension }
 
@@ -19,7 +19,7 @@ services:
     # ten listener jest po to żeby dla zaplecza dało się stworzyć osobny motyw
     vsymfo_core.event.listener.themegroup:
         class: vSymfo\Bundle\CoreBundle\EventListener\ThemeGroupListener
-        arguments: [@service_container]
+        arguments: ["@service_container"]
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 2 }
 
@@ -31,14 +31,14 @@ services:
     # tworzenie usługi dokumentu po otrzymaniu parametru _format z routera
     vsymfo_core.event.listener.document:
         class: vSymfo\Bundle\CoreBundle\EventListener\DocumentListener
-        arguments: [@service_container]
+        arguments: ["@service_container"]
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 1 }
 
     # usługa przechwytuje niektóre wyjątki i decyduje co ma być wyświetlone
     vsymfo_core.event.listener.exception:
         class:  vSymfo\Bundle\CoreBundle\EventListener\ExceptionListener
-        arguments: [@service_container]
+        arguments: ["@service_container"]
         tags:
             - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
 
