@@ -129,7 +129,7 @@ final class HtmlDocumentSetup implements DocumentSetupInterface
         }
 
         // html lang
-        $this->doc->element('html')->attr('lang', $container->get('request')->getLocale());
+        $this->doc->element('html')->attr('lang', $container->get('request_stack')->getCurrentRequest()->getLocale());
 
         // znacznik base
         /* Może powodować problemy w linkach z kratką
