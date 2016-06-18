@@ -15,7 +15,6 @@ namespace vSymfo\Bundle\CoreBundle\Controller;
 use Symfony\Bundle\TwigBundle\Controller\ExceptionController as EC;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -27,7 +26,7 @@ use vSymfo\Bundle\CoreBundle\EventListener\DocumentListener;
  * @package vSymfo Core Bundle
  * @subpackage Controller
  */
-class ExceptionController extends EC
+abstract class ExceptionControllerBase extends EC
 {
     /**
      * @var ContainerInterface
@@ -44,9 +43,13 @@ class ExceptionController extends EC
     }
 
     /**
-     * {@inheritdoc}
+     * @param Request $request
+     * @param $exception
+     * @param DebugLoggerInterface|null $logger
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showAction(Request $request, FlattenException $exception, DebugLoggerInterface $logger = null)
+    protected function _showAction(Request $request, $exception, DebugLoggerInterface $logger = null)
     {
         if ($request->get('format') === 'html' && $this->container->get('kernel')->getEnvironment() === 'prod') {
             // trzeba utworzyć dodatkową usługę dokumentu
@@ -62,5 +65,29 @@ class ExceptionController extends EC
         }
 
         return parent::showAction($request, $exception, $logger);
+    }
+}
+
+if (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION < 3) {
+    class ExceptionController extends ExceptionControllerBase
+    {
+        /**
+         * {@inheritdoc}
+         */
+        public function showAction(Request $request, \Symfony\Component\HttpKernel\Exception\FlattenException $exception, DebugLoggerInterface $logger = null)
+        {
+            return $this->_showAction($request, $exception, $logger);
+        }
+    }
+} else {
+    class ExceptionController extends ExceptionControllerBase
+    {
+        /**
+         * {@inheritdoc}
+         */
+        public function showAction(Request $request, \Symfony\Component\Debug\Exception\FlattenException $exception, DebugLoggerInterface $logger = null)
+        {
+            return $this->_showAction($request, $exception, $logger);
+        }
     }
 }
