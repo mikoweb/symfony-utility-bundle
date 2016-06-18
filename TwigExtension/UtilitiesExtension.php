@@ -13,6 +13,7 @@
 namespace vSymfo\Bundle\CoreBundle\TwigExtension;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\Kernel;
 use vSymfo\Component\Document\UrlManager;
 
 /**
@@ -184,7 +185,11 @@ class UtilitiesExtension extends \Twig_Extension
     public function cdnAsset($path, $type = 'image')
     {
         $params = $this->container->getParameter('vsymfo_core.document');
-        $asset = $this->container->get('templating.helper.assets');
+        if (Kernel::MAJOR_VERSION < 3) {
+            $asset = $this->container->get('templating.helper.assets');
+        } else {
+            $asset = $this->container->get('assets.package');
+        }
 
         if (!$params['cdn_enable']) {
             return $asset->getUrl($path);
