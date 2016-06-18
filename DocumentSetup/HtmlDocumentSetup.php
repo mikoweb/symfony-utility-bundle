@@ -168,6 +168,7 @@ final class HtmlDocumentSetup implements DocumentSetupInterface
         $jsloader->add(
             new JavaScriptResource('',
                 array(
+                    $dir . '/engine/js/marionette-fix.js',
                     $dir . '/engine/js/modernizr/modernizr.custom.js',
                     $dir . '/engine/js/modernizr/modernizr.es5.js',
                     $dir . '/engine/js/modernizr/isarray.js',
