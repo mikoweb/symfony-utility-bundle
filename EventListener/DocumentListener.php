@@ -87,7 +87,7 @@ class DocumentListener
 
             if (!empty($route))  {
                 $defaultFormat = is_null($route->getDefault('_format')) ? 'html' : $route->getDefault('_format');
-                $format = !is_null($request->get('_format')) ? $request->get('_format') : $defaultFormat;
+                $format = !is_null($request->attributes->get('_format')) ? $request->attributes->get('_format') : $defaultFormat;
             }
         }
 
