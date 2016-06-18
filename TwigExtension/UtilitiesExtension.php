@@ -188,7 +188,7 @@ class UtilitiesExtension extends \Twig_Extension
         if (Kernel::MAJOR_VERSION < 3) {
             $asset = $this->container->get('templating.helper.assets');
         } else {
-            $asset = $this->container->get('assets.package');
+            $asset = $this->container->get('assets.packages');
         }
 
         if (!$params['cdn_enable']) {
