@@ -13,6 +13,7 @@
 namespace vSymfo\Bundle\CoreBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use vSymfo\Bundle\CoreBundle\DocumentSetup\HtmlDocumentSetup;
 use vSymfo\Component\Document\Format\HtmlDocument;
@@ -31,6 +32,7 @@ class ResourcesController extends Controller
     /**
      * Arkusz CSS dla określonego modułu WebUI
      *
+     * @param Request $request
      * @param $name nazwa modułu
      * @param $theme nazwa motywu graficznego
      *
@@ -38,7 +40,7 @@ class ResourcesController extends Controller
      *
      * @throws NotFoundHttpException
      */
-    public function webuiCssAction($name, $theme)
+    public function webuiCssAction(Request $request, $name, $theme)
     {
         try {
             $this->get('liip_theme.active_theme')->setName($theme);
@@ -88,15 +90,19 @@ class ResourcesController extends Controller
         $manager->render('html');
         $res = $manager->resources();
         $source = $res[0]->getCombineObject()->getPath();
+
         $response = new Response();
+        $date = new \DateTime();
+        $date->setTimestamp(filemtime($source));
+        $response->setLastModified($date);
+        $response->setPublic();
+
+        if ($response->isNotModified($request)) {
+            return $response;
+        }
+
         $response->setContent(file_get_contents($source));
         $response->headers->set('Content-Type', 'text/css');
-
-        if ($this->get('kernel')->getEnvironment() === 'prod') {
-            $date = new \DateTime();
-            $date->modify('+1 week');
-            $response->setExpires($date);
-        }
 
         return $response;
     }
