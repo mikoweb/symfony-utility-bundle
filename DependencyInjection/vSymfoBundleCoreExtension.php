@@ -25,6 +25,8 @@ use vSymfo\Core\ExtensionAbstract;
  * @author Rafał Mikołajun <rafal@vision-web.pl>
  * @package vSymfo Core Bundle
  * @subpackage DependencyInjection
+ * 
+ * @todo Ta klasa ma dziedziczyć po symfonowym Extension.
  */
 class vSymfoBundleCoreExtension extends ExtensionAbstract
 {
@@ -35,6 +37,8 @@ class vSymfoBundleCoreExtension extends ExtensionAbstract
     {
         $configuration = new Configuration($this->getAlias());
         $config = $this->processConfiguration($configuration, $configs);
+        // @todo zamiast tej motody trzeba użyć $container->setParameter
+        // @todo używać pełnych ścieżek do kluczy z wyjątkiem vsymfo_core.document, do którego w dalszym ciągu bedzie przekazana tablica
         $this->setParameterAll($container, $config);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
