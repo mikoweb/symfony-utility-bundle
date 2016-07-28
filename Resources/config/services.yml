@@ -45,4 +45,15 @@ services:
     # kontroler obsługi wyjątków
     vsymfo_core.twig.exception_controller:
         class: vSymfo\Bundle\CoreBundle\Controller\ExceptionController
-        arguments: [ "@twig", "%kernel.debug%", "@service_container" ]
+        arguments: ["@twig", "%kernel.debug%", "@service_container"]
+
+    vsymfo_core.entity.provider.url:
+        class: vSymfo\Bundle\CoreBundle\Entity\Provider\UrlProvider
+        arguments: ["@router"]
+
+    vsymfo_core.entity.provider.renderer:
+        class: vSymfo\Bundle\CoreBundle\Entity\Provider\RendererProvider
+        arguments: ["@twig"]
+
+    vsymfo_core.entity.provider.images:
+        class: vSymfo\Bundle\CoreBundle\Entity\Provider\ImagesProvider
