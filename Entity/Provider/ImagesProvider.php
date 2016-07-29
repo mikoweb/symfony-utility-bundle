@@ -12,7 +12,9 @@
 
 namespace vSymfo\Bundle\CoreBundle\Entity\Provider;
 
+use Symfony\Component\Asset\Packages;
 use vSymfo\Core\Entity\Provider\ImagesProviderInterface;
+use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 
 /**
  * @author Rafał Mikołajun <rafal@vision-web.pl>
@@ -22,11 +24,39 @@ use vSymfo\Core\Entity\Provider\ImagesProviderInterface;
 class ImagesProvider implements ImagesProviderInterface
 {
     /**
+     * @var Packages
+     */
+    protected $assetPackages;
+
+    /**
+     * @var UploaderHelper
+     */
+    protected $uploaderHelper;
+
+    /**
+     * @param Packages $assetPackages
+     * @param UploaderHelper $uploaderHelper
+     */
+    public function __construct(Packages $assetPackages, UploaderHelper $uploaderHelper)
+    {
+        $this->assetPackages = $assetPackages;
+        $this->uploaderHelper = $uploaderHelper;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function asset($obj, $fieldName)
     {
-        // TODO: Implement asset() method.
+        return $this->uploaderHelper->asset($obj, $fieldName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUrl($path, $packageName = null)
+    {
+        return $this->assetPackages->getUrl($path, $packageName);
     }
 
     /**
