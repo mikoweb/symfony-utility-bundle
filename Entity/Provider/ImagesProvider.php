@@ -227,7 +227,7 @@ class ImagesProvider implements ImagesProviderInterface
      * @param object $obj
      * @param string $fieldName
      * @param string|null $layout
-     * 
+     *
      * @return ImageResource
      */
     protected function createImageResource($obj, $fieldName, $layout)
@@ -235,7 +235,8 @@ class ImagesProvider implements ImagesProviderInterface
         $loader = $this->getLoader($obj, $fieldName);
         $config = $loader->getConfig();
         $options = $loader->getOptions();
-        $sources = [$this->asset($obj, $fieldName)];
+        $fileName = $this->asset($obj, $fieldName);
+        $sources = [empty($fileName) ? 'default_image.png' : $fileName];
         $resource = new ImageResource(
             $this->getAlt($obj, isset($config['alt_property']) ? $config['alt_property'] : null),
             $sources, array_merge([
@@ -248,7 +249,7 @@ class ImagesProvider implements ImagesProviderInterface
             $this->filterConfiguration,
             $this->cacheManager,
             $this->mappingService,
-            get_class($obj), 
+            get_class($obj),
             $fieldName,
             $layout
         ));
