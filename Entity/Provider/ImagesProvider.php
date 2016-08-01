@@ -14,6 +14,7 @@ namespace vSymfo\Bundle\CoreBundle\Entity\Provider;
 
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
+use Stringy\Stringy as S;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -22,6 +23,8 @@ use vSymfo\Bundle\CoreBundle\Service\ImagesMappingService;
 use vSymfo\Component\Document\Resources\ImageResource;
 use vSymfo\Component\Document\Resources\ImageResourceManager;
 use vSymfo\Core\ApplicationPaths;
+use vSymfo\Core\Caller\CallerException;
+use vSymfo\Core\Caller\CallerInterface;
 use vSymfo\Core\Entity\Provider\ImagesProviderInterface;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 
@@ -30,7 +33,7 @@ use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
  * @package vSymfo Core Bundle
  * @subpackage Entity_Provider
  */
-class ImagesProvider implements ImagesProviderInterface
+class ImagesProvider implements ImagesProviderInterface, CallerInterface
 {
     const DEFAULT_LAYOUT_NAME = '{DEFAULT}';
 
@@ -119,6 +122,32 @@ class ImagesProvider implements ImagesProviderInterface
     /**
      * {@inheritdoc}
      */
+    public function assetOrDefault($obj, $fieldName)
+    {
+        $path = $this->asset($obj, $fieldName);
+
+        return empty($path) ? $this->getDefaultPath() : $path; 
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultPath()
+    {
+        return self::DEFAULT_PATH;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function imageFilter($path, $filter, array $runtimeConfig = [], $resolver = null)
+    {
+        return $this->cacheManager->getBrowserPath($path, $filter, $runtimeConfig, $resolver);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getUrl($path, $packageName = null)
     {
         return $this->assetPackages->getUrl($path, $packageName);
@@ -148,6 +177,133 @@ class ImagesProvider implements ImagesProviderInterface
         $manager = $this->getResourceManager($obj, $fieldName, $layout);
 
         return $this->renderImage($manager, $obj, $fieldName, $format, $layout);
+    }
+
+    /**
+     * The naming convention:
+     *
+     * imgImagePath                     => assetOrDefault($obj, 'image')
+     * imgFieldNamePath                 => assetOrDefault($obj, 'fieldName')
+     * imgFieldNamePath_                => asset($obj, 'fieldName')
+     *
+     * imgImageUrl                      => getUrl(assetOrDefault($obj, 'image'))
+     * imgFieldNameUrl                  => getUrl(assetOrDefault($obj, 'fieldName'))
+     * imgFieldNameUrl_                 => getUrl(asset($obj, 'fieldName'))
+     *
+     * imgImage_LightboxFilter          => imageFilter(assetOrDefault($obj, 'image'), 'lightbox')
+     * imgFieldName_FilterNameFilter    => imageFilter(assetOrDefault($obj, 'fieldName'), 'filter_name')
+     * imgFieldName_FilterNameFilter_   => imageFilter(asset($obj, 'fieldName'), 'filter_name')
+     *
+     * imgImageRender                   => render($obj, 'image', 'html_picture', null)
+     * imgImage__ImgRender              => render($obj, 'image', 'html_img', null)
+     * imgImage_IconRender              => render($obj, 'image', 'html_picture', 'icon')
+     * imgImage_Icon_ImgRender          => render($obj, 'image', 'html_img', 'icon')
+     *
+     * {@inheritdoc}
+     */
+    public function call($obj, $name, array $arguments)
+    {
+        if (strrpos($name, '_') === strlen($name) - 1) {
+            $name = substr($name, 0, -1);
+            $orDefault = false;
+        } else {
+            $orDefault = true;
+        }
+
+        $delimit = S::create($name)->delimit('-');
+        $arr = explode('-', $delimit);
+
+        if (count($arr) > 2) {
+            $prefix = $arr[0];
+            $suffix = $arr[count($arr) - 1];
+
+            if ($prefix === $this->callPrefix()) {
+                $exception = new CallerException();
+                $cut = (string) S::create($name)->slice(strlen($prefix), -strlen($suffix));
+                $params = explode('_', $cut);
+                $paramsLength = count($params);
+                $fieldName = lcfirst($params[0]);
+
+                switch ($suffix) {
+                    case 'render':
+                        switch ($paramsLength) {
+                            case 1:
+                                $exception->setReturn($this->render($obj, $fieldName, 
+                                    ImageResourceManager::FORMAT_HTML_PICTURE));
+                                throw $exception;
+                                break;
+                            case 2:
+                                $exception->setReturn($this->render($obj, $fieldName, 
+                                    ImageResourceManager::FORMAT_HTML_PICTURE,
+                                    (string) S::create($params[1])->underscored()));
+                                throw $exception;
+                                break;
+                            case 3:
+                                $format = strtolower($params[2]);
+                                if ($format === 'img' || $format === 'picture') {
+                                    $exception->setReturn($this->render($obj, $fieldName,
+                                        $format === 'img' 
+                                            ? ImageResourceManager::FORMAT_HTML_IMG
+                                            : ImageResourceManager::FORMAT_HTML_PICTURE,
+                                        (string) S::create($params[1])->underscored()));
+                                    throw $exception;
+                                }
+                                break;
+                        }
+                        break;
+                    case 'filter':
+                        if ($paramsLength === 2) {
+                            $exception->setReturn($this->imageFilter(
+                                $this->assetTernary($obj, $fieldName, $orDefault),
+                                (string) S::create($params[1])->underscored(),
+                                isset($arguments[0]) && is_array($arguments[0]) ? $arguments[0] : [],
+                                isset($arguments[1]) && is_string($arguments[1]) ? $arguments[1] : null
+                            ));
+
+                            throw $exception;
+                        }
+                        break;
+                    case 'path':
+                        if ($paramsLength === 1) {
+                            $exception->setReturn($this->assetTernary($obj, $fieldName, $orDefault));
+                            throw $exception;
+                        }
+                        break;
+                    case 'url':
+                        if ($paramsLength === 1) {
+                            $exception->setReturn($this->getUrl(
+                                $this->assetTernary($obj, $fieldName, $orDefault),
+                                isset($arguments[0]) && is_string($arguments[0]) ? $arguments[0] : null
+                            ));
+
+                            throw $exception;
+                        }
+                        break;
+                }
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function callPrefix()
+    {
+        return 'img';
+    }
+
+    /**
+     * @param object $obj
+     * @param string $fieldName
+     * @param bool $orDefault
+     *
+     * @return string
+     */
+    protected function assetTernary($obj, $fieldName, $orDefault = false)
+    {
+        return $orDefault
+            ? $this->assetOrDefault($obj, $fieldName)
+            : $this->asset($obj, $fieldName);
     }
 
     /**
@@ -236,7 +392,7 @@ class ImagesProvider implements ImagesProviderInterface
         $config = $loader->getConfig();
         $options = $loader->getOptions();
         $fileName = $this->asset($obj, $fieldName);
-        $sources = [empty($fileName) ? 'default_image.png' : $fileName];
+        $sources = [$fileName ? $fileName : $this->getDefaultPath()];
         $resource = new ImageResource(
             $this->getAlt($obj, isset($config['alt_property']) ? $config['alt_property'] : null),
             $sources, array_merge([
