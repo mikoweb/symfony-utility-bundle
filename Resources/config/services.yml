@@ -11,11 +11,6 @@ services:
         tags:
             - { name: twig.extension }
 
-    vsymfo_core.twig.noscript:
-        class: vSymfo\Bundle\CoreBundle\TwigExtension\NoScriptExtension
-        tags:
-            - { name: twig.extension }
-
     # ten listener jest po to żeby dla zaplecza dało się stworzyć osobny motyw
     vsymfo_core.event.listener.themegroup:
         class: vSymfo\Bundle\CoreBundle\EventListener\ThemeGroupListener
@@ -49,7 +44,10 @@ services:
 
     vsymfo_core.entity_factory:
         class: vSymfo\Bundle\CoreBundle\Entity\EntityFactory
-        arguments: ["@vsymfo_core.entity.provider.images", "@vsymfo_core.entity.provider.renderer", "@vsymfo_core.entity.provider.url"]
+        arguments:
+            - "@vsymfo_core.entity.provider.images"
+            - "@vsymfo_core.entity.provider.renderer"
+            - "@vsymfo_core.entity.provider.url"
 
     vsymfo_core.entity.providers_subscriber:
         class: vSymfo\Bundle\CoreBundle\EventListener\EntityProvidersSubscriber
@@ -71,3 +69,26 @@ services:
         arguments:
             - "@assets.packages"
             - "@vich_uploader.templating.helper.uploader_helper"
+            - "@app_path"
+            - "@liip_imagine.filter.configuration"
+            - "@liip_imagine.cache.manager"
+            - "@vsymfo_core.service.images_mapping"
+            - "%kernel.environment%"
+
+    vsymfo_core.service.images_mapping:
+        class: vSymfo\Bundle\CoreBundle\Service\ImagesMappingService
+        arguments:
+            - mapping.yml
+            - "@app_path"
+            - "@liip_imagine.filter.configuration"
+            - "%kernel.environment%"
+
+    vsymfo_core.liip_imagine.controller:
+        class: vSymfo\Bundle\CoreBundle\Controller\LiipImagineController
+        arguments:
+            - "@vsymfo_core.service.images_mapping"
+            - "@liip_imagine.data.manager"
+            - "@liip_imagine.filter.manager"
+            - "@liip_imagine.cache.manager"
+            - "@liip_imagine.cache.signer"
+            - "@logger"
