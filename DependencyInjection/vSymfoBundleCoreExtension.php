@@ -13,9 +13,9 @@
 namespace vSymfo\Bundle\CoreBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Loader;
-use vSymfo\Core\ExtensionAbstract;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -25,10 +25,8 @@ use vSymfo\Core\ExtensionAbstract;
  * @author Rafał Mikołajun <rafal@vision-web.pl>
  * @package vSymfo Core Bundle
  * @subpackage DependencyInjection
- * 
- * @todo Ta klasa ma dziedziczyć po symfonowym Extension.
  */
-class vSymfoBundleCoreExtension extends ExtensionAbstract
+class vSymfoBundleCoreExtension extends Extension
 {
     /**
      * {@inheritdoc}
@@ -37,9 +35,15 @@ class vSymfoBundleCoreExtension extends ExtensionAbstract
     {
         $configuration = new Configuration($this->getAlias());
         $config = $this->processConfiguration($configuration, $configs);
-        // @todo zamiast tej motody trzeba użyć $container->setParameter
-        // @todo używać pełnych ścieżek do kluczy z wyjątkiem vsymfo_core.document, do którego w dalszym ciągu bedzie przekazana tablica
-        $this->setParameterAll($container, $config);
+
+        $container->setParameter('vsymfo_core.document', $config['document']);
+        $container->setParameter('vsymfo_core.themes', $config['themes']);
+        $container->setParameter('vsymfo_core.theme', $config['theme']);
+        $container->setParameter('vsymfo_core.theme_backend', $config['theme_backend']);
+        $container->setParameter('vsymfo_core.pagination.limit', $config['pagination']['limit']);
+        $container->setParameter('vsymfo_core.pagination.pages_in_range', $config['pagination']['pages_in_range']);
+        $container->setParameter('vsymfo_core.mailer.noreply_email', $config['mailer']['noreply_email']);
+        $container->setParameter('vsymfo_core.mailer.default_email', $config['mailer']['default_email']);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
