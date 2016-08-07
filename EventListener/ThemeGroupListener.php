@@ -72,10 +72,6 @@ class ThemeGroupListener
 
         $route = $collection->get($request->get('_route'));
 
-        if (empty($route)) {
-            $route = $collection->get($request->get('_locale') . '__RG__' . $request->get('_route'));
-        }
-
         if (!empty($route) && $route->hasOption('theme_group'))  {
             $group = $route->getOption('theme_group');
             $this->theme->setName($group . '_' . $this->container->getParameter('vsymfo_core.theme_' . $group));

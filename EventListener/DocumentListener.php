@@ -12,6 +12,7 @@
 
 namespace vSymfo\Bundle\CoreBundle\EventListener;
 
+use JMS\I18nRoutingBundle\Router\I18nRouter;
 use ReflectionClass;
 use vSymfo\Bundle\CoreBundle\DocumentSetup;
 use Symfony\Component\Routing\RouterInterface;
@@ -78,12 +79,14 @@ class DocumentListener
             $format = $this->forceFormat;
         } else {
             $request = $event->getRequest();
-            $collection = $this->router->getRouteCollection();
-            $route = $collection->get($request->get('_route'));
 
-            if (empty($route)) {
-                $route = $collection->get($request->get('_locale'). '__RG__'. $request->get('_route'));
+            if ($this->router instanceof I18nRouter) {
+                $collection = $this->router->getOriginalRouteCollection();
+            } else {
+                $collection = $this->router->getRouteCollection();
             }
+
+            $route = $collection->get($request->get('_route'));
 
             if (!empty($route))  {
                 $defaultFormat = is_null($route->getDefault('_format')) ? 'html' : $route->getDefault('_format');
