@@ -19,7 +19,7 @@
         "liip/theme-bundle": "~1.4",
         "vich/uploader-bundle": "~1.2",
         "liip/imagine-bundle": "~1.5",
-        "mikoweb/vsymfo-core": "~0.1",
+        "mikoweb/vsymfo-core": "~0.2",
         "mikoweb/vsymfo-document": "~1.2"
     },
     "autoload": {
