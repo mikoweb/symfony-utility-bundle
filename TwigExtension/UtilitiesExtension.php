@@ -13,7 +13,6 @@
 namespace vSymfo\Bundle\CoreBundle\TwigExtension;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\Kernel;
 use vSymfo\Component\Document\UrlManager;
 
 /**
