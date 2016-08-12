@@ -92,3 +92,8 @@ services:
             - "@liip_imagine.cache.manager"
             - "@liip_imagine.cache.signer"
             - "@logger"
+
+    vsymfo_core.crud_factory:
+        class: vSymfo\Bundle\CoreBundle\Crud\CrudFactory
+        calls:
+            - [setContainer, ["@service_container"]]
