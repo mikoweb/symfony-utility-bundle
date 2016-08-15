@@ -97,3 +97,8 @@ services:
         class: vSymfo\Bundle\CoreBundle\Crud\CrudFactory
         calls:
             - [setContainer, ["@service_container"]]
+
+    vsymfo_core.routing.crud_loader:
+        class: vSymfo\Bundle\CoreBundle\Routing\CrudLoader
+        tags:
+            - { name: routing.loader }
