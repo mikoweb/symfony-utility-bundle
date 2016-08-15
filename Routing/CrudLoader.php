@@ -177,6 +177,7 @@ class CrudLoader extends Loader
             $root->setMethods(['GET']);
             $root->setDefault('_controller', 'FrameworkBundle:Redirect:redirect');
             $root->setDefault('route', $options['route_prefix'] . '_index');
+            $root->setDefault('_locale', null);
             $routes['root'] = $root;
         } else {
             $route = new Route('/');
