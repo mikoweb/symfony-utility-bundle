@@ -49,7 +49,7 @@ class Crud extends CrudAbstract
         $data->setEntity($entity);
         $form = $this->getManager()->buildForm($entity, array_merge($options['form_options'], [
             'action' => $this->generateUrl($this->storeRoute()),
-        ]));
+        ]), $options['form_type']);
         $data->setForm($form);
         $dispatcher = new EventDispatcher();
         $this->addListeners($dispatcher, $options['events']);
@@ -68,7 +68,7 @@ class Crud extends CrudAbstract
         $options = $this->commonOptionsResolver()->resolve($options);
         $data = new Data();
         $entity = $this->getManager()->createEntity();
-        $form = $this->getManager()->buildForm($entity);
+        $form = $this->getManager()->buildForm($entity, $options['form_options'], $options['form_type']);
         $data->setEntity($entity);
         $data->setForm($form);
         $dispatcher = new EventDispatcher();
@@ -116,7 +116,7 @@ class Crud extends CrudAbstract
         $data->setEntity($entity);
         $form = $this->getManager()->buildForm($entity, array_merge($options['form_options'], [
             'action' => $this->generateUrl($this->updateRoute(), $this->routeParameters($data, $options)),
-        ]));
+        ]), $options['form_type']);
         $data->setForm($form);
         $dispatcher = new EventDispatcher();
         $this->addListeners($dispatcher, $options['events']);
@@ -135,7 +135,7 @@ class Crud extends CrudAbstract
         $options = $this->commonOptionsResolver()->resolve($options);
         $data = new Data();
         $entity = $this->getManager()->findEntity($request);
-        $form = $this->getManager()->buildForm($entity);
+        $form = $this->getManager()->buildForm($entity, $options['form_options'], $options['form_type']);
         $data->setEntity($entity);
         $data->setForm($form);
         $dispatcher = new EventDispatcher();
@@ -195,6 +195,7 @@ class Crud extends CrudAbstract
         $resolver->setDefaults([
             'events' => [],
             'form_options' => [],
+            'form_type' => null,
             'add_flash' => true,
             'redirect_url' => null,
             'route_params' => null,
