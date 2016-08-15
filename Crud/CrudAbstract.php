@@ -97,7 +97,7 @@ abstract class CrudAbstract implements CrudInterface
     }
 
     /**
-     * @return CrudableInterface
+     * {@inheritdoc}
      */
     public function getRelated()
     {
@@ -105,7 +105,7 @@ abstract class CrudAbstract implements CrudInterface
     }
 
     /**
-     * @param CrudableInterface $related
+     * {@inheritdoc}
      */
     public function setRelated(CrudableInterface $related)
     {
@@ -165,6 +165,62 @@ abstract class CrudAbstract implements CrudInterface
     public function addFlash($type, $messageId)
     {
         $this->container->get('session')->getFlashBag()->add($this->flashType($type), $this->message($messageId));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function indexRoute()
+    {
+        return $this->options['route_prefix'] . '_index';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createRoute()
+    {
+        return $this->options['route_prefix'] . '_create';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function storeRoute()
+    {
+        return $this->options['route_prefix'] . '_store';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function showRoute()
+    {
+        return $this->options['route_prefix'] . '_show';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function editRoute()
+    {
+        return $this->options['route_prefix'] . '_edit';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function updateRoute()
+    {
+        return $this->options['route_prefix'] . '_update';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function destroyRoute()
+    {
+        return $this->options['route_prefix'] . '_destroy';
     }
 
     /**
@@ -242,62 +298,6 @@ abstract class CrudAbstract implements CrudInterface
         }
 
         return $params;
-    }
-
-    /**
-     * @return string
-     */
-    protected function indexRoute()
-    {
-        return $this->options['route_prefix'] . '_index';
-    }
-
-    /**
-     * @return string
-     */
-    protected function createRoute()
-    {
-        return $this->options['route_prefix'] . '_create';
-    }
-
-    /**
-     * @return string
-     */
-    protected function storeRoute()
-    {
-        return $this->options['route_prefix'] . '_store';
-    }
-
-    /**
-     * @return string
-     */
-    protected function showRoute()
-    {
-        return $this->options['route_prefix'] . '_show';
-    }
-
-    /**
-     * @return string
-     */
-    protected function editRoute()
-    {
-        return $this->options['route_prefix'] . '_edit';
-    }
-
-    /**
-     * @return string
-     */
-    protected function updateRoute()
-    {
-        return $this->options['route_prefix'] . '_update';
-    }
-
-    /**
-     * @return string
-     */
-    protected function destroyRoute()
-    {
-        return $this->options['route_prefix'] . '_destroy';
     }
 
     /**
