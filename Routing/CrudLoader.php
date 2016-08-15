@@ -42,7 +42,15 @@ class CrudLoader extends Loader
             $collection->addPrefix($crud->getPath());
             $resolver = $this->getOptionsResolver();
             $options = $resolver->resolve($crud->getOptions());
+            $controller = $options['controller'];
             $except = $options['except'];
+
+            foreach ($collection->all() as $route) {
+                $value = $route->getDefault('_controller');
+                if (strpos($value, ':') === false) {
+                    $route->setDefault('_controller', $controller . ':' . $value);
+                }
+            }
 
             if (!in_array('read', $except)) {
                 if (!in_array('index', $except)) {
