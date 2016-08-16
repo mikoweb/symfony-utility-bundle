@@ -3,7 +3,7 @@
     "type": "symfony-bundle",
     "description": "vSymfo Core Bundle",
     "homepage": "http://vision-web.pl",
-    "license": "GPLv3",
+    "license": "LGPLv3",
     "authors": [
         {
             "name": "Rafał Mikołajun",
