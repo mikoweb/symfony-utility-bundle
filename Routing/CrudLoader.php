@@ -45,10 +45,15 @@ class CrudLoader extends Loader
             $controller = $options['controller'];
             $except = $options['except'];
 
-            foreach ($collection->all() as $route) {
+            foreach ($collection->all() as $name => $route) {
                 $value = $route->getDefault('_controller');
                 if (strpos($value, ':') === false) {
                     $route->setDefault('_controller', $controller . ':' . $value);
+                }
+
+                if (strpos($name, '_') === 0) {
+                    $collection->add($options['route_prefix'] . $name, $route);
+                    $collection->remove($name);
                 }
             }
 
@@ -191,7 +196,7 @@ class CrudLoader extends Loader
 
     /**
      * @param array $options
-     * 
+     *
      * @return array
      */
     protected function indexSortParams(array $options)
