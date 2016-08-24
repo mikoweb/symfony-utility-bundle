@@ -10,22 +10,23 @@
  * file that was distributed with this source code.
  */
 
-namespace vSymfo\Bundle\CoreBundle\DocumentSetup;
+namespace vSymfo\Bundle\CoreBundle\Service\Document;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use vSymfo\Component\Document\Interfaces\DocumentInterface;
 
 /**
- * Ustawienia dokumentu
  * @author Rafał Mikołajun <rafal@vision-web.pl>
  * @package vSymfo Core Bundle
- * @subpackage DocumentSetup
+ * @subpackage Service
  */
-interface DocumentSetupInterface
+interface DocumentFactoryInterface
 {
     /**
-     * Ta funkcja skonfiguruje dokument
-     * @param ContainerInterface $container
-     * @return mixed
+     * Returns document ready to render.
+     *
+     * @param array $options
+     *
+     * @return DocumentInterface
      */
-    public function setup(ContainerInterface $container);
+    public function createDocument(array $options = []);
 }

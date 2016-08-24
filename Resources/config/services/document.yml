@@ -1,0 +1,46 @@
+services:
+    # Default document. Look to DocumentListener.
+    document:
+        class: vSymfo\Component\Document\Format\HtmlDocument
+
+    # Create document onKernelRequest.
+    vsymfo_core.event.listener.document:
+        class: vSymfo\Bundle\CoreBundle\EventListener\DocumentListener
+        calls:
+            - [setContainer, ["@service_container"]]
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 1 }
+
+    vsymfo_core.service.document:
+        class: vSymfo\Bundle\CoreBundle\Service\Document\DocumentService
+        arguments: ["%vsymfo_core.document%"]
+
+    vsymfo_core.service.html_document:
+        class: vSymfo\Bundle\CoreBundle\Service\Document\HtmlDocumentService
+        arguments:
+            - "@app_path"
+            - "%%kernel.environment%"
+            - "%vsymfo_core.document%"
+            - "@request_stack"
+            - "@twig"
+            - "@liip_theme.active_theme"
+            - "@translator"
+
+    vsymfo_core.service.pdf_document:
+        class: vSymfo\Bundle\CoreBundle\Service\Document\PdfDocumentService
+        arguments:
+            - "@app_path"
+            - "%vsymfo_core.document%"
+            - "@request_stack"
+
+    vsymfo_core.service.xml_document:
+        class: vSymfo\Bundle\CoreBundle\Service\Document\XmlDocumentService
+
+    vsymfo_core.service.rss_document:
+        class: vSymfo\Bundle\CoreBundle\Service\Document\RssDocumentService
+
+    vsymfo_core.service.atom_document:
+        class: vSymfo\Bundle\CoreBundle\Service\Document\AtomDocumentService
+
+    vsymfo_core.service.txt_document:
+        class: vSymfo\Bundle\CoreBundle\Service\Document\TxtDocumentService

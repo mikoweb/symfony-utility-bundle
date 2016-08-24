@@ -1,0 +1,18 @@
+services:
+    vsymfo_core.service.images_mapping:
+        class: vSymfo\Bundle\CoreBundle\Service\ImagesMappingService
+        arguments:
+            - mapping.yml
+            - "@app_path"
+            - "@liip_imagine.filter.configuration"
+            - "%kernel.environment%"
+
+    vsymfo_core.liip_imagine.controller:
+        class: vSymfo\Bundle\CoreBundle\Controller\LiipImagineController
+        arguments:
+            - "@vsymfo_core.service.images_mapping"
+            - "@liip_imagine.data.manager"
+            - "@liip_imagine.filter.manager"
+            - "@liip_imagine.cache.manager"
+            - "@liip_imagine.cache.signer"
+            - "@logger"

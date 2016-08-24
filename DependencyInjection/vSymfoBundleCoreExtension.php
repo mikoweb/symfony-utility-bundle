@@ -47,6 +47,10 @@ class vSymfoBundleCoreExtension extends Extension
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
+        $loader->load('services/document.yml');
+        $loader->load('services/entity.yml');
+        $loader->load('services/images.yml');
+        $loader->load('services/crud.yml');
     }
 
     /**

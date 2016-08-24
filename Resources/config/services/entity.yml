@@ -1,0 +1,33 @@
+services:
+    vsymfo_core.entity_factory:
+        class: vSymfo\Bundle\CoreBundle\Entity\EntityFactory
+        arguments:
+            - "@vsymfo_core.entity.provider.images"
+            - "@vsymfo_core.entity.provider.renderer"
+            - "@vsymfo_core.entity.provider.url"
+
+    vsymfo_core.entity.providers_subscriber:
+        class: vSymfo\Bundle\CoreBundle\EventListener\EntityProvidersSubscriber
+        calls:
+            - [setContainer, ["@service_container"]]
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+
+    vsymfo_core.entity.provider.url:
+        class: vSymfo\Bundle\CoreBundle\Entity\Provider\UrlProvider
+        arguments: ["@router"]
+
+    vsymfo_core.entity.provider.renderer:
+        class: vSymfo\Bundle\CoreBundle\Entity\Provider\RendererProvider
+        arguments: ["@twig"]
+
+    vsymfo_core.entity.provider.images:
+        class: vSymfo\Bundle\CoreBundle\Entity\Provider\ImagesProvider
+        arguments:
+            - "@assets.packages"
+            - "@vich_uploader.templating.helper.uploader_helper"
+            - "@app_path"
+            - "@liip_imagine.filter.configuration"
+            - "@liip_imagine.cache.manager"
+            - "@vsymfo_core.service.images_mapping"
+            - "%kernel.environment%"

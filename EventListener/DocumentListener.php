@@ -13,20 +13,21 @@
 namespace vSymfo\Bundle\CoreBundle\EventListener;
 
 use JMS\I18nRoutingBundle\Router\I18nRouter;
-use ReflectionClass;
-use vSymfo\Bundle\CoreBundle\DocumentSetup;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use vSymfo\Bundle\CoreBundle\Service\Document\DocumentFactoryInterface;
 use vSymfo\Component\Document\Format;
 
 /**
- * Tworzenie usługi dokumentu
+ * Create document.
+ *
  * @author Rafał Mikołajun <rafal@vision-web.pl>
  * @package vSymfo Core Bundle
  * @subpackage EventListener
  */
-class DocumentListener
+class DocumentListener implements ContainerAwareInterface
 {
     /**
      * @var ContainerInterface
@@ -34,38 +35,41 @@ class DocumentListener
     private $container;
 
     /**
-     * Router
      * @var RouterInterface
      */
     protected $router;
 
     /**
-     * Wymuszenie formatu dokumentu na sztywno
      * @var string|null
      */
-    protected $forceFormat = null;
+    protected $forceFormat;
 
     /**
-     * Nazwa usługi do zapisania
      * @var string
      */
-    protected $serviceName = 'document';
+    protected $serviceName;
 
     /**
-     * @param ContainerInterface $container
      * @param string|null $forceFormat
      * @param string $serviceName
      */
-    public function __construct(ContainerInterface $container, $forceFormat = null, $serviceName = 'document')
+    public function __construct($forceFormat = null, $serviceName = 'document')
     {
         if (!is_string($serviceName)) {
             throw new \InvalidArgumentException('serviceName is not string');
         }
-
-        $this->container = $container;
-        $this->router = $container->get('router');
+ 
         $this->forceFormat = is_string($forceFormat) ? $forceFormat : null;
         $this->serviceName = $serviceName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+        $this->router = $container->get('router');
     }
 
     /**
@@ -94,39 +98,19 @@ class DocumentListener
             }
         }
 
-        if (!is_null($format))  {
-            switch ($format) {
-                case 'html':
-                    $doc = new Format\HtmlDocument();
-                    $setup = new DocumentSetup\HtmlDocumentSetup($doc);
-                    $setup->setup($this->container);
-                    break;
-                case 'xml':
-                    $doc = new Format\XmlDocument();
-                    break;
-                case 'pdf':
-                    $doc = new Format\PdfDocument();
-                    $setup = new DocumentSetup\PdfDocumentSetup($doc);
-                    $setup->setup($this->container);
-                    break;
-                case 'rss':
-                    $doc = new Format\RssDocument();
-                    break;
-                case 'atom':
-                    $doc = new Format\AtomDocument();
-                    break;
-                case 'txt':
-                default:
-                    $doc = new Format\TxtDocument();
+        if (!is_null($format)) {
+            $serviceName = 'vsymfo_core.service.' . strtolower($format) . '_document';
+
+            if ($this->container->has($serviceName)
+                && $this->container->get($serviceName) instanceof DocumentFactoryInterface
+            ) {
+                $service = $this->container->get($serviceName);
+            } else {
+                $service = $this->container->get('vsymfo_core.service.txt_document');
             }
 
-            $params = $this->container->getParameter("vsymfo_core.document");
-            $r = new ReflectionClass('vSymfo\Component\Document\Format\DocumentAbstract');
-            $mode = $r->getConstant("TITLE_" . strtoupper($params["title_mode"]));
-            $doc->name($params["sitename"]);
-            $doc->title($params["title_default"], $mode, $params["title_separator"]);
-            $doc->keywords($params["keywords"]);
-            $doc->description($params["description"]);
+            $doc = $service->createDocument();
+            $this->container->get('vsymfo_core.service.document')->setDefaultsToDocument($doc);
             $this->container->set($this->serviceName, $doc);
         }
     }

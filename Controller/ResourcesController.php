@@ -18,10 +18,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use vSymfo\Bundle\CoreBundle\DocumentSetup\HtmlDocumentSetup;
 use vSymfo\Component\Document\Format\HtmlDocument;
 use vSymfo\Component\Document\Resources\StyleSheetResource;
+use vSymfo\Core\ApplicationPaths;
 use vSymfo\Core\Controller;
 
 /**
- * Kontroler zasobów dla WebUI
+ * Resources controller i.a. for WebUI.
  *
  * @author Rafał Mikołajun <rafal@vision-web.pl>
  * @package vSymfo Core Bundle
@@ -30,11 +31,11 @@ use vSymfo\Core\Controller;
 class ResourcesController extends Controller
 {
     /**
-     * Arkusz CSS dla określonego modułu WebUI
+     * Gets StyleSheet for WebUI module.
      *
      * @param Request $request
-     * @param $name nazwa modułu
-     * @param $theme nazwa motywu graficznego
+     * @param $name Module name.
+     * @param $theme Theme name.
      *
      * @return Response
      *
@@ -54,31 +55,32 @@ class ResourcesController extends Controller
 
         $name = str_replace('|', '/', $name);
         $doc = new HtmlDocument();
-        $params = $this->container->getParameter("vsymfo_core.document");
-        $path = $this->container->get('app_path');
+        $params = $this->getParameter("vsymfo_core.document");
+        $path = $this->get('app_path');
+        $documentService = $this->get('vsymfo_core.service.html_document');
 
-        $preprocessorData = HtmlDocumentSetup::getPreprocessorData($path);
+        $preprocessorData = $documentService->getPreprocessorData();
         $preprocessorImportVariables = $preprocessorData['variables'];
         $preprocessorImportDirs = [
-            $path->absolute("web_theme") . $path::WEB_WEBUI . '/' => $path->url('web_theme')  . '/',
+            $path->absolute("web_theme") . ApplicationPaths::WEB_WEBUI . '/' => $path->url('web_theme')  . '/',
             $path->absolute("webui") . '/' => $path->url('web_theme')  . '/',
-            $path->absolute("web_theme") . $path::WEB_RESOURCES  . '/' => $path->url('web_theme')  . '/',
+            $path->absolute("web_theme") . ApplicationPaths::WEB_RESOURCES  . '/' => $path->url('web_theme')  . '/',
             $path->absolute("web_resources") . '/' => $path->url('web_theme')  . '/',
             $path->absolute("web") . '/' => $path->url('web_theme')  . '/',
         ];
 
-        $utility = HtmlDocumentSetup::getUtility($path, $this->container->get('kernel')->getEnvironment(), $params, array(
+        $utility = $documentService->getUtility($params, [
             'less_import_dirs' => $preprocessorImportDirs,
             'less_variables'   => $preprocessorImportVariables,
             'scss_import_dirs' => array_keys($preprocessorImportDirs),
             'scss_variables'   => $preprocessorImportVariables,
-        ));
+        ]);
 
-        $utility->createResOnAdd($doc, "stylesheet", "default");
-        $doc->resources("stylesheet")->chooseOnAdd("default");
+        $utility->createResOnAdd($doc, 'stylesheet', 'default');
+        $doc->resources('stylesheet')->chooseOnAdd('default');
 
-        $manager = $doc->resources("stylesheet");
-        $manager->getGroups()->addGroup("webui");
+        $manager = $doc->resources('stylesheet');
+        $manager->getGroups()->addGroup('webui');
 
         $manager->add(
             new StyleSheetResource(str_replace('/', '__', $name),
@@ -116,14 +118,14 @@ class ResourcesController extends Controller
      */
     private function cssFilename($name)
     {
-        $path = $this->container->get('app_path');
+        $path = $this->get('app_path');
         $nameInfo = pathinfo($name);
         $basePath = null;
         $baseUrl = null;
 
-        if (file_exists($path->absolute('web_theme') . $path::WEB_WEBUI . '/' . $name . '.json')) {
-            $basePath = $path->absolute('web_theme') . $path::WEB_WEBUI . '/' . $nameInfo['dirname'];
-            $baseUrl = $path->url('web_theme', false)  . $path::WEB_WEBUI . '/' . $nameInfo['dirname'];
+        if (file_exists($path->absolute('web_theme') . ApplicationPaths::WEB_WEBUI . '/' . $name . '.json')) {
+            $basePath = $path->absolute('web_theme') . ApplicationPaths::WEB_WEBUI . '/' . $nameInfo['dirname'];
+            $baseUrl = $path->url('web_theme', false)  . ApplicationPaths::WEB_WEBUI . '/' . $nameInfo['dirname'];
         } elseif (file_exists($path->absolute('webui') . '/' . $name . '.json')) {
             $basePath = $path->absolute('webui') . '/' . $nameInfo['dirname'];
             $baseUrl = $path->url('webui', false) . '/' . $nameInfo['dirname'];

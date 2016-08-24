@@ -1,104 +1,30 @@
 services:
-    # klasa do pobierania adresów ścieżek
+    # Used to gets aplication paths.
     app_path:
         class: vSymfo\Core\ApplicationPaths
         arguments: ["@service_container"]
 
-    # rozszerzenia twig
     vsymfo_core.twig.utilities:
         class: vSymfo\Bundle\CoreBundle\TwigExtension\UtilitiesExtension
         arguments: ["@service_container"]
         tags:
             - { name: twig.extension }
 
-    # ten listener jest po to żeby dla zaplecza dało się stworzyć osobny motyw
+    # Theme groups listener
     vsymfo_core.event.listener.themegroup:
         class: vSymfo\Bundle\CoreBundle\EventListener\ThemeGroupListener
         arguments: ["@service_container"]
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 2 }
 
-    # implementacja dokumentu, domyślnie html ale format i tak będzie zależał od parametru _format w urlu
-    # więcej informacji w klasie DocumentListener
-    document:
-        class: vSymfo\Component\Document\Format\HtmlDocument
-
-    # tworzenie usługi dokumentu po otrzymaniu parametru _format z routera
-    vsymfo_core.event.listener.document:
-        class: vSymfo\Bundle\CoreBundle\EventListener\DocumentListener
-        arguments: ["@service_container"]
-        tags:
-            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 1 }
-
-    # usługa przechwytuje niektóre wyjątki i decyduje co ma być wyświetlone
+    # Custom error pages.
     vsymfo_core.event.listener.exception:
         class:  vSymfo\Bundle\CoreBundle\EventListener\ExceptionListener
         arguments: ["@service_container"]
         tags:
             - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
 
-    # kontroler obsługi wyjątków
+    # Custom error pages controller.
     vsymfo_core.twig.exception_controller:
         class: vSymfo\Bundle\CoreBundle\Controller\ExceptionController
         arguments: ["@twig", "%kernel.debug%", "@service_container"]
-
-    vsymfo_core.entity_factory:
-        class: vSymfo\Bundle\CoreBundle\Entity\EntityFactory
-        arguments:
-            - "@vsymfo_core.entity.provider.images"
-            - "@vsymfo_core.entity.provider.renderer"
-            - "@vsymfo_core.entity.provider.url"
-
-    vsymfo_core.entity.providers_subscriber:
-        class: vSymfo\Bundle\CoreBundle\EventListener\EntityProvidersSubscriber
-        calls:
-            - [setContainer, ["@service_container"]]
-        tags:
-            - { name: doctrine.event_subscriber, connection: default }
-
-    vsymfo_core.entity.provider.url:
-        class: vSymfo\Bundle\CoreBundle\Entity\Provider\UrlProvider
-        arguments: ["@router"]
-
-    vsymfo_core.entity.provider.renderer:
-        class: vSymfo\Bundle\CoreBundle\Entity\Provider\RendererProvider
-        arguments: ["@twig"]
-
-    vsymfo_core.entity.provider.images:
-        class: vSymfo\Bundle\CoreBundle\Entity\Provider\ImagesProvider
-        arguments:
-            - "@assets.packages"
-            - "@vich_uploader.templating.helper.uploader_helper"
-            - "@app_path"
-            - "@liip_imagine.filter.configuration"
-            - "@liip_imagine.cache.manager"
-            - "@vsymfo_core.service.images_mapping"
-            - "%kernel.environment%"
-
-    vsymfo_core.service.images_mapping:
-        class: vSymfo\Bundle\CoreBundle\Service\ImagesMappingService
-        arguments:
-            - mapping.yml
-            - "@app_path"
-            - "@liip_imagine.filter.configuration"
-            - "%kernel.environment%"
-
-    vsymfo_core.liip_imagine.controller:
-        class: vSymfo\Bundle\CoreBundle\Controller\LiipImagineController
-        arguments:
-            - "@vsymfo_core.service.images_mapping"
-            - "@liip_imagine.data.manager"
-            - "@liip_imagine.filter.manager"
-            - "@liip_imagine.cache.manager"
-            - "@liip_imagine.cache.signer"
-            - "@logger"
-
-    vsymfo_core.crud_factory:
-        class: vSymfo\Bundle\CoreBundle\Crud\CrudFactory
-        calls:
-            - [setContainer, ["@service_container"]]
-
-    vsymfo_core.routing.crud_loader:
-        class: vSymfo\Bundle\CoreBundle\Routing\CrudLoader
-        tags:
-            - { name: routing.loader }
