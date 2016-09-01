@@ -18,7 +18,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\TranslatorInterface;
 use vSymfo\Component\Document\FileLoader\TranslationLoader;
 use vSymfo\Component\Document\Format\HtmlDocument;
-use vSymfo\Component\Document\Resources\JavaScriptResource;
 use vSymfo\Component\Document\Resources\JavaScriptResourceManager;
 use vSymfo\Component\Document\Utility\HtmlResourcesUtility;
 use vSymfo\Core\ApplicationPaths;
@@ -140,38 +139,17 @@ class HtmlDocumentService implements DocumentFactoryInterface
         $loader = $utility->createResourcesLoader($document, 'javascript', $locator, $this->appPaths->url("web_theme", false) . ApplicationPaths::WEB_RESOURCES);
         $loader->load('html_resources.yml', 'theme');
 
-        // copy manager to generate js loader
-        $dir = $this->appPaths->url('web_resources', false);
-        $jsloader = clone $document->resources("javascript");
-        $jsloader->getGroups()->addGroup("jsloader");
-        $jsloader->add(
-            new JavaScriptResource('',
-                [
-                    $dir . '/engine/js/marionette-fix.js',
-                    $dir . '/engine/js/modernizr/modernizr.custom.js',
-                    $dir . '/engine/js/modernizr/modernizr.es5.js',
-                    $dir . '/engine/js/modernizr/isarray.js',
-                    $dir . '/engine/js/modernizr/yepnope.js',
-                    $dir . '/engine/js/core/jsloader/jsloader.js',
-                    $dir . '/fosjsrouting.js',
-                    $dir . '/startapp.js'
-                ],
-                ['combine' => true]
-            ), 'jsloader'
-        );
-
         // js initializer
+        $jsloader = $this->getJsLoader();
         $script = $document->element('script');
         $twig = $this->twig;
-        $jsloaderPath = $jsloader->render('array');
-        $jsloaderPath = $jsloaderPath['resources']['jsloader'][0]['url'][0];
         $params = $this->params;
         $appPaths = $this->appPaths;
         $theme = $this->theme;
         $document->setScriptOutput(function (JavaScriptResourceManager $manager, array $translations)
-            use($jsloaderPath, $params, $script, $twig, $appPaths, $theme)
+            use($jsloader, $params, $script, $twig, $appPaths, $theme)
         {
-            $output = '<script src="' . $jsloaderPath . '" type="text/javascript"></script>';
+            $output = $jsloader->render('html');
             $output .= '<script type="text/javascript">';
             $output .= $twig->render('::head.js.twig', [
                 "resources" => $manager->render('array'),
@@ -276,5 +254,25 @@ class HtmlDocumentService implements DocumentFactoryInterface
                 'cdn_javascript' => $params['cdn_javascript'],
                 'cdn_css'        => $params['cdn_css'],
             ], $custom));
+    }
+
+    /**
+     * @return JavaScriptResourceManager
+     */
+    public function getJsLoader()
+    {
+        $utility = $this->getUtility($this->params, [
+            'cache_db_dir'   => $this->appPaths->absolute('kernel_cache') . '/../document_jsloader/loader',
+            'web_cache_dir'  => $this->appPaths->absolute('web_cache'),
+            'web_cache_url'  => $this->appPaths->url('web_cache'),
+        ]);
+        $doc = new HtmlDocument();
+        $utility->createResOnAdd($doc, "javascript", "default");
+        $doc->resources("javascript")->chooseOnAdd("default");
+        $locator = new FileLocator($this->appPaths->absolute("kernel_root") . '/document');
+        $loader = $utility->createResourcesLoader($doc, 'javascript', $locator, '/');
+        $loader->load('jsloader.yml', 'jsloader');
+
+        return $doc->resources("javascript");
     }
 }
