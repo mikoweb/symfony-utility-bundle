@@ -19,7 +19,7 @@ services:
         class: vSymfo\Bundle\CoreBundle\Service\Document\HtmlDocumentService
         arguments:
             - "@app_path"
-            - "%%kernel.environment%"
+            - "%kernel.environment%"
             - "%vsymfo_core.document%"
             - "@request_stack"
             - "@twig"
