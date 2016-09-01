@@ -61,8 +61,8 @@ class PdfDocumentService implements DocumentFactoryInterface
         $params = $this->params;
         $request = $this->requestStack->getCurrentRequest();
         $document->setOptions($this->getWkHtmlToPdfOptions($request->getUri(), $params['pdf_wkhtmltopdf_bin']));
-        $document->outputSelector(function() {
-            return isset($_GET['do']) ? $_GET['do'] : null;
+        $document->outputSelector(function() use($request) {
+            return $request->query->get('do');
         });
 
         $head = $document->element('head');
