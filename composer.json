@@ -14,7 +14,6 @@
     "require": {
         "php": ">=5.5.9",
         "symfony/dependency-injection": "~2.8|~3.0",
-        "friendsofsymfony/jsrouting-bundle": "~1.6",
         "mikoweb/ccdn-user-security-bundle": "~3.0.0",
         "liip/theme-bundle": "~1.4",
         "vich/uploader-bundle": "~1.2",
