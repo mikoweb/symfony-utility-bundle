@@ -55,27 +55,10 @@ class ResourcesController extends Controller
 
         $name = str_replace('|', '/', $name);
         $doc = new HtmlDocument();
-        $params = $this->getParameter("vsymfo_core.document");
-        $path = $this->get('app_path');
+        $params = $this->getParameter('vsymfo_core.document');
         $documentService = $this->get('vsymfo_core.service.html_document');
 
-        $preprocessorData = $documentService->getPreprocessorData();
-        $preprocessorImportVariables = $preprocessorData['variables'];
-        $preprocessorImportDirs = [
-            $path->absolute("web_theme") . ApplicationPaths::WEB_WEBUI . '/' => $path->url('web_theme')  . '/',
-            $path->absolute("webui") . '/' => $path->url('web_theme')  . '/',
-            $path->absolute("web_theme") . ApplicationPaths::WEB_RESOURCES  . '/' => $path->url('web_theme')  . '/',
-            $path->absolute("web_resources") . '/' => $path->url('web_theme')  . '/',
-            $path->absolute("web") . '/' => $path->url('web_theme')  . '/',
-        ];
-
-        $utility = $documentService->getUtility($params, [
-            'less_import_dirs' => $preprocessorImportDirs,
-            'less_variables'   => $preprocessorImportVariables,
-            'scss_import_dirs' => array_keys($preprocessorImportDirs),
-            'scss_variables'   => $preprocessorImportVariables,
-        ]);
-
+        $utility = $documentService->getUtility($params);
         $utility->createResOnAdd($doc, 'stylesheet', 'default');
         $doc->resources('stylesheet')->chooseOnAdd('default');
 
@@ -122,13 +105,14 @@ class ResourcesController extends Controller
         $nameInfo = pathinfo($name);
         $basePath = null;
         $baseUrl = null;
+        $webUiFolder = '/webui/';
 
-        if (file_exists($path->absolute('web_theme') . ApplicationPaths::WEB_WEBUI . '/' . $name . '.json')) {
-            $basePath = $path->absolute('web_theme') . ApplicationPaths::WEB_WEBUI . '/' . $nameInfo['dirname'];
-            $baseUrl = $path->url('web_theme', false)  . ApplicationPaths::WEB_WEBUI . '/' . $nameInfo['dirname'];
-        } elseif (file_exists($path->absolute('webui') . '/' . $name . '.json')) {
-            $basePath = $path->absolute('webui') . '/' . $nameInfo['dirname'];
-            $baseUrl = $path->url('webui', false) . '/' . $nameInfo['dirname'];
+        if (file_exists($path->absolute('private_theme') . ApplicationPaths::WEBUI . '/' . $name . '.json')) {
+            $basePath = $path->absolute('private_theme') . ApplicationPaths::WEBUI . '/' . $nameInfo['dirname'];
+            $baseUrl = $path->getThemePath()  . ApplicationPaths::WEBUI . '/' . $nameInfo['dirname'];
+        } elseif (file_exists($path->absolute('webui') . $webUiFolder . $name . '.json')) {
+            $basePath = $path->absolute('webui') . $webUiFolder . $nameInfo['dirname'];
+            $baseUrl = ApplicationPaths::WEBUI . $webUiFolder . $nameInfo['dirname'];
         }
 
         if (!$basePath) {

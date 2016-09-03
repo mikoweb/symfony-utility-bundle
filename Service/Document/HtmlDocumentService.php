@@ -128,15 +128,15 @@ class HtmlDocumentService implements DocumentFactoryInterface
         $document->resources("javascript")->chooseOnAdd("default");
         $document->resources("stylesheet")->chooseOnAdd("default");
 
-        $locator = new FileLocator($this->appPaths->absolute("kernel_root") . '/document');
-        $loader = $utility->createResourcesLoader($document, 'javascript', $locator, $this->appPaths->url('web_resources', false));
+        $locator = new FileLocator($this->appPaths->getRootDir() . '/document');
+        $loader = $utility->createResourcesLoader($document, 'javascript', $locator, '/');
         $loader->load('html_resources.yml', 'framework');
         $loader->load('html_resources.yml', 'core');
 
-        $locator = new FileLocator($this->appPaths->absolute("kernel_root") . '/theme/' . $this->appPaths->getThemeName());
-        $loader = $utility->createResourcesLoader($document, 'stylesheet', $locator, $this->appPaths->url("web_theme", false) . ApplicationPaths::WEB_RESOURCES);
+        $locator = new FileLocator($this->appPaths->absolute('private_theme'));
+        $loader = $utility->createResourcesLoader($document, 'stylesheet', $locator, $this->appPaths->getThemePath() . '/src');
         $loader->load('html_resources.yml', 'theme');
-        $loader = $utility->createResourcesLoader($document, 'javascript', $locator, $this->appPaths->url("web_theme", false) . ApplicationPaths::WEB_RESOURCES);
+        $loader = $utility->createResourcesLoader($document, 'javascript', $locator, $this->appPaths->getThemePath() . '/src');
         $loader->load('html_resources.yml', 'theme');
 
         // js initializer
@@ -159,8 +159,6 @@ class HtmlDocumentService implements DocumentFactoryInterface
                 "path" => [
                     "base" => $appPaths->url("base"),
                     "theme" => $appPaths->url("web_theme"),
-                    "webui" => $appPaths->url("webui"),
-                    "webui_engine" => $appPaths->url("webui_engine"),
                     "resources" => $appPaths->url("web_resources"),
                     "cdn_javascript" => $params['cdn_enable'] ? $params['cdn_javascript'] : '',
                     "cdn_css" => $params['cdn_enable'] ? $params['cdn_css'] : '',
@@ -205,19 +203,20 @@ class HtmlDocumentService implements DocumentFactoryInterface
      */
     public function getPreprocessorData()
     {
+        $commonUrl = $this->appPaths->url('web_theme') . '/';  
+
         return [
             'variables' => [
-                'path-base'         => '"' . $this->appPaths->url('base') . '"',
-                'path-theme'        => '"' . $this->appPaths->url('web_theme') . '"',
-                'path-resources'    => '"' . $this->appPaths->url('web_resources') . '"',
-                'path-webui'        => '"' . $this->appPaths->url('webui') . '"',
-                'path-webui-engine' => '"' . $this->appPaths->url('webui_engine') . '"',
+                'path-base'      => '"' . $this->appPaths->url('base') . '"',
+                'path-theme'     => '"' . $this->appPaths->url('web_theme') . '"',
+                'path-resources' => '"' . $this->appPaths->url('web_resources') . '"'
             ],
             'import_dirs' => [
-                $this->appPaths->absolute('web_theme') . ApplicationPaths::WEB_RESOURCES  . '/' 
-                    => $this->appPaths->url('web_theme')  . '/',
-                $this->appPaths->absolute('web_resources') . '/' => $this->appPaths->url('web_theme')  . '/',
-                $this->appPaths->absolute('web') . '/' => $this->appPaths->url('web_theme')  . '/',
+                $this->appPaths->absolute('private_theme') . '/src/' => $commonUrl,
+                $this->appPaths->absolute('private_theme') . ApplicationPaths::WEBUI .'/' => $commonUrl,
+                $this->appPaths->getPrivateDir() . '/' => $commonUrl,
+                $this->appPaths->absolute('webui') . '/' => $commonUrl,
+                $this->appPaths->absolute('bower_components') . '/' => $commonUrl,
             ],
         ];
     }
@@ -239,8 +238,8 @@ class HtmlDocumentService implements DocumentFactoryInterface
                     . $this->appPaths->getThemeName(),
                 'cache_refresh'  => $this->env == 'dev',
                 'cache_lifetime' => $params['resources_cache_lifetime'],
-                'web_dir'        => $this->appPaths->absolute('web'),
-                'web_url'        => $this->appPaths->url('web'),
+                'web_dir'        => $this->appPaths->getPrivateDir(),
+                'web_url'        => $this->appPaths->getBasePath(),
                 'web_cache_dir'  => $this->appPaths->absolute('web_cache') . '/' . $this->appPaths->getThemeName(),
                 'web_cache_url'  => $this->appPaths->url('web_cache') . '/' . $this->appPaths->getThemeName(),
                 'less_import_dirs' => $preprocessorData['import_dirs'],

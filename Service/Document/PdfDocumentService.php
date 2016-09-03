@@ -79,7 +79,7 @@ class PdfDocumentService implements DocumentFactoryInterface
         $style->attr('href', $request->getSchemeAndHttpHost() . $this->appPaths->url("web") . '/pdf/css/pdf.css');
         $style->insertTo($head);
 
-        $filename = $this->appPaths->absolute("kernel_root") . '/../pdf/' . $request->getPathInfo();
+        $filename = $this->appPaths->getRootDir() . '/../pdf/' . $request->getPathInfo();
         $dir = dirname($filename);
         if (!is_dir($dir)) {
             mkdir($dir, 0755, true);
@@ -107,7 +107,7 @@ class PdfDocumentService implements DocumentFactoryInterface
             'remote_url' => $uri . '?do=display',
             'pluginDetect_PDFReader_url' => $this->appPaths->url('web') . '/pdf/PluginDetect_PDFReader.js',
             'waiting_view_path' => $this->appPaths->absolute('web') . '/pdf/waiting-view.html',
-            'queue_db_path' => $this->appPaths->absolute('kernel_root') . '/pdf/queue.db',
+            'queue_db_path' => $this->appPaths->getRootDir() . '/pdf/queue.db',
             'wkhtmltopdf_global' => [
                 'binary' => $wkHtmlToPdfBin
             ]
