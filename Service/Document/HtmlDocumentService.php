@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\TranslatorInterface;
 use vSymfo\Component\Document\FileLoader\TranslationLoader;
 use vSymfo\Component\Document\Format\HtmlDocument;
+use vSymfo\Component\Document\Resources\Interfaces\CombineResourceInterface;
 use vSymfo\Component\Document\Resources\JavaScriptResourceManager;
 use vSymfo\Component\Document\Utility\HtmlResourcesUtility;
 use vSymfo\Core\ApplicationPaths;
@@ -146,10 +147,22 @@ class HtmlDocumentService implements DocumentFactoryInterface
         $params = $this->params;
         $appPaths = $this->appPaths;
         $theme = $this->theme;
+        $env = $this->env;
         $document->setScriptOutput(function (JavaScriptResourceManager $manager, array $translations)
-            use($jsloader, $params, $script, $twig, $appPaths, $theme)
+            use($jsloader, $params, $script, $twig, $appPaths, $theme, $env)
         {
             $output = $jsloader->render('html');
+
+            if ($env === 'dev') {
+                foreach ($jsloader->resources() as $resource) {
+                    if ($resource instanceof CombineResourceInterface
+                        && $resource->getCombineObject()->getException() instanceof \Exception
+                    ) {
+                        throw $resource->getCombineObject()->getException();
+                    }
+                }
+            }
+
             $output .= '<script type="text/javascript">';
             $output .= $twig->render('::head.js.twig', [
                 "resources" => $manager->render('array'),
