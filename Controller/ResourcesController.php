@@ -34,8 +34,8 @@ class ResourcesController extends Controller
      * Gets StyleSheet for WebUI module.
      *
      * @param Request $request
-     * @param $name Module name.
-     * @param $theme Theme name.
+     * @param string $name Module name.
+     * @param string $theme Theme name.
      *
      * @return Response
      *
@@ -75,6 +75,10 @@ class ResourcesController extends Controller
         $manager->render('html');
         $res = $manager->resources();
         $source = $res[0]->getCombineObject()->getPath();
+
+        if ($res[0]->getCombineObject()->getException() instanceof \Exception) {
+            throw $res[0]->getCombineObject()->getException();
+        }
 
         $response = new Response();
         $date = new \DateTime();
