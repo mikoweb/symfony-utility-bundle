@@ -3,6 +3,11 @@ services:
     document:
         class: vSymfo\Component\Document\Format\HtmlDocument
 
+    vsymfo_core.controller.resources:
+        class: vSymfo\Bundle\CoreBundle\Controller\ResourcesController
+        calls:
+            - [setContainer, ["@service_container"]]
+
     # Create document onKernelRequest.
     vsymfo_core.event.listener.document:
         class: vSymfo\Bundle\CoreBundle\EventListener\DocumentListener
