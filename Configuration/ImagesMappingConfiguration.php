@@ -20,7 +20,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  * 
  * @author Rafał Mikołajun <rafal@vision-web.pl>
  * @package vSymfo Core Bundle
- * @subpackage Document_Configuration
+ * @subpackage Configuration
  */
 class ImagesMappingConfiguration implements ConfigurationInterface
 {
