@@ -6,5 +6,7 @@ services:
 
     vsymfo_core.routing.crud_loader:
         class: vSymfo\Bundle\CoreBundle\Routing\CrudLoader
+        calls:
+            - [setContainer, ["@service_container"]]
         tags:
             - { name: routing.loader }
