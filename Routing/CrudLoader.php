@@ -13,6 +13,8 @@
 namespace vSymfo\Bundle\CoreBundle\Routing;
 
 use Symfony\Component\Config\Loader\Loader;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -22,12 +24,25 @@ use Symfony\Component\Routing\RouteCollection;
  * @package vSymfo Core Bundle
  * @subpackage Routing
  */
-class CrudLoader extends Loader
+class CrudLoader extends Loader implements ContainerAwareInterface
 {
     /**
      * @var OptionsResolver
      */
     private $optionsResolver;
+
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
 
     /**
      * {@inheritdoc}
@@ -44,6 +59,7 @@ class CrudLoader extends Loader
             $options = $resolver->resolve($crud->getOptions());
             $controller = $options['controller'];
             $except = $options['except'];
+            $routePrefix = $this->routePrefix($options['route_prefix']);
 
             foreach ($collection->all() as $name => $route) {
                 $value = $route->getDefault('_controller');
@@ -52,7 +68,7 @@ class CrudLoader extends Loader
                 }
 
                 if (strpos($name, '_') === 0) {
-                    $collection->add($options['route_prefix'] . $name, $route);
+                    $collection->add($routePrefix . $name, $route);
                     $collection->remove($name);
                 }
             }
@@ -61,31 +77,31 @@ class CrudLoader extends Loader
                 if (!in_array('index', $except)) {
                     $index = $this->indexRoute($options);
                     if (isset($index['root'])) {
-                        $collection->add($options['route_prefix'] . '_root', $index['root']);
+                        $collection->add($routePrefix . '_root', $index['root']);
                     }
 
                     if (isset($index['index'])) {
-                        $collection->add($options['route_prefix'] . '_index', $index['index']);
+                        $collection->add($routePrefix . '_index', $index['index']);
                     }
                 }
 
                 if (!in_array('show', $except)) {
-                    $collection->add($options['route_prefix'] . '_show', $this->showRoute($options));
+                    $collection->add($routePrefix . '_show', $this->showRoute($options));
                 }
             }
 
             if (!in_array('create', $except)) {
-                $collection->add($options['route_prefix'] . '_create', $this->createRoute($options));
-                $collection->add($options['route_prefix'] . '_store', $this->storeRoute($options));
+                $collection->add($routePrefix . '_create', $this->createRoute($options));
+                $collection->add($routePrefix . '_store', $this->storeRoute($options));
             }
 
             if (!in_array('update', $except)) {
-                $collection->add($options['route_prefix'] . '_edit', $this->editRoute($options));
-                $collection->add($options['route_prefix'] . '_update', $this->updateRoute($options));
+                $collection->add($routePrefix . '_edit', $this->editRoute($options));
+                $collection->add($routePrefix . '_update', $this->updateRoute($options));
             }
 
             if (!in_array('delete', $except)) {
-                $collection->add($options['route_prefix'] . '_destroy', $this->destroyRoute($options));
+                $collection->add($routePrefix . '_destroy', $this->destroyRoute($options));
             }
         }
 
@@ -181,7 +197,7 @@ class CrudLoader extends Loader
             $root = new Route('/');
             $root->setMethods(['GET']);
             $root->setDefault('_controller', 'FrameworkBundle:Redirect:redirect');
-            $root->setDefault('route', $options['route_prefix'] . '_index');
+            $root->setDefault('route', $this->routePrefix($options['route_prefix']) . '_index');
             $root->setDefault('_locale', null);
             $routes['root'] = $root;
         } else {
@@ -318,5 +334,19 @@ class CrudLoader extends Loader
         $route->setRequirement('id', '\d+');
 
         return $route;
+    }
+
+    /**
+     * @param string $prefix
+     *
+     * @return string
+     */
+    protected function routePrefix($prefix)
+    {
+        if (strpos($prefix, '%') === 0 && strrpos($prefix, '%') === strlen($prefix) - 1) {
+            $prefix = $this->container->getParameter(substr($prefix, 1, -1));
+        }
+
+        return $prefix;
     }
 }
