@@ -47,13 +47,11 @@ function startapp (data) {
     });
 
     jsloader.onLoad('core', function () {
-        require(['jquery'], function ($) {
-            $.app.define("locale", data.locale);
-            $.app.define("path_base", data.path.base);
-            $.app.define("path_theme", data.path.theme);
-            $.app.define("path_resources", data.path.resources);
-            $.app.trans.add(data.translations);
-        });
+        jQuery.app.define("locale", data.locale);
+        jQuery.app.define("path_base", data.path.base);
+        jQuery.app.define("path_theme", data.path.theme);
+        jQuery.app.define("path_resources", data.path.resources);
+        jQuery.app.trans.add(data.translations);
     });
 
     startapp = undefined;
