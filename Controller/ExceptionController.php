@@ -51,9 +51,10 @@ abstract class ExceptionControllerBase extends EC implements ContainerAwareInter
      */
     protected function _showAction(Request $request, $exception, DebugLoggerInterface $logger = null)
     {
-        if ($request->get('format') === 'html' && $this->container->get('kernel')->getEnvironment() === 'prod') {
+        if ($request->get('format', 'html') === 'html' && $this->container->get('kernel')->getEnvironment() === 'prod') {
             // trzeba utworzyć dodatkową usługę dokumentu
-            $docListener = new DocumentListener($this->container, 'html', 'exception_document');
+            $docListener = new DocumentListener('html', 'exception_document');
+            $docListener->setContainer($this->container);
             $event = new GetResponseEvent($this->container->get('kernel'), $request, HttpKernelInterface::MASTER_REQUEST);
             $docListener->onKernelRequest($event);
 
