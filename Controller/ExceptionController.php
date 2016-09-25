@@ -13,6 +13,7 @@
 namespace vSymfo\Bundle\CoreBundle\Controller;
 
 use Symfony\Bundle\TwigBundle\Controller\ExceptionController as EC;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
@@ -26,7 +27,7 @@ use vSymfo\Bundle\CoreBundle\EventListener\DocumentListener;
  * @package vSymfo Core Bundle
  * @subpackage Controller
  */
-abstract class ExceptionControllerBase extends EC
+abstract class ExceptionControllerBase extends EC implements ContainerAwareInterface
 {
     /**
      * @var ContainerInterface
@@ -36,9 +37,8 @@ abstract class ExceptionControllerBase extends EC
     /**
      * {@inheritdoc}
      */
-    public function __construct(\Twig_Environment $twig, $debug, ContainerInterface $container)
+    public function setContainer(ContainerInterface $container = null)
     {
-        parent::__construct($twig, $debug);
         $this->container = $container;
     }
 

@@ -16,19 +16,18 @@ use JMS\I18nRoutingBundle\Router\I18nRouter;
 use Liip\ThemeBundle\ActiveTheme;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Rozszerzenie bundla LiipThemeBundle o możliwość grupowania motywów.
- * Na przykład: panel administracyjny powinien mieć osobny motyw graficzny.
- * W tym celu w rutingu trzeba umieścić wpis: option.theme_group: nazwa_grupy.
- * Zostanie wtedy załadowany szablon o nazwie: nazwa_grupy_ + container->getParameter('vsymfo_core.theme_' + nazwa_grupy)
+ * Custom themes groups.
+ * Support for routing option `theme_group`.
  *
  * @author Rafał Mikołajun <rafal@vision-web.pl>
  * @package vSymfo Core Bundle
  * @subpackage EventListener
  */
-class ThemeGroupListener
+class ThemeGroupListener implements ContainerAwareInterface
 {
     /**
      * @var ContainerInterface
@@ -48,9 +47,9 @@ class ThemeGroupListener
     protected $router;
 
     /**
-     * @param ContainerInterface $container
+     * {@inheritdoc}
      */
-    public function __construct(ContainerInterface $container)
+    public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
         $this->theme = $container->get('liip_theme.active_theme');

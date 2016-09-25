@@ -12,6 +12,7 @@
 
 namespace vSymfo\Bundle\CoreBundle\TwigExtension;
 
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use vSymfo\Component\Document\UrlManager;
 
@@ -20,7 +21,7 @@ use vSymfo\Component\Document\UrlManager;
  * @package vSymfo Core Bundle
  * @subpackage TwigExtension
  */
-class UtilitiesExtension extends \Twig_Extension
+class UtilitiesExtension extends \Twig_Extension implements ContainerAwareInterface
 {
     /**
      * @var ContainerInterface
@@ -28,9 +29,9 @@ class UtilitiesExtension extends \Twig_Extension
     protected $container;
 
     /**
-     * @param ContainerInterface $container
+     * {@inheritdoc}
      */
-    public function __construct(ContainerInterface $container)
+    public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
     }

@@ -7,25 +7,30 @@ services:
 
     vsymfo_core.twig.utilities:
         class: vSymfo\Bundle\CoreBundle\TwigExtension\UtilitiesExtension
-        arguments: ["@service_container"]
+        calls:
+            - [setContainer, ["@service_container"]]
         tags:
             - { name: twig.extension }
 
     # Theme groups listener
     vsymfo_core.event.listener.themegroup:
         class: vSymfo\Bundle\CoreBundle\EventListener\ThemeGroupListener
-        arguments: ["@service_container"]
+        calls:
+            - [setContainer, ["@service_container"]]
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 2 }
 
     # Custom error pages.
     vsymfo_core.event.listener.exception:
         class:  vSymfo\Bundle\CoreBundle\EventListener\ExceptionListener
-        arguments: ["@service_container"]
+        calls:
+            - [setContainer, ["@service_container"]]
         tags:
             - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
 
     # Custom error pages controller.
     vsymfo_core.twig.exception_controller:
         class: vSymfo\Bundle\CoreBundle\Controller\ExceptionController
-        arguments: ["@twig", "%kernel.debug%", "@service_container"]
+        arguments: ["@twig", "%kernel.debug%"]
+        calls:
+            - [setContainer, ["@service_container"]]

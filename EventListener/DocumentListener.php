@@ -14,9 +14,9 @@ namespace vSymfo\Bundle\CoreBundle\EventListener;
 
 use JMS\I18nRoutingBundle\Router\I18nRouter;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use vSymfo\Bundle\CoreBundle\Service\Document\DocumentFactoryInterface;
 use vSymfo\Component\Document\Format;
 

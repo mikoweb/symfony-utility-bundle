@@ -13,17 +13,19 @@
 namespace vSymfo\Bundle\CoreBundle\EventListener;
 
 use CCDNUser\SecurityBundle\Component\Listener\AccessDeniedExceptionFactory;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 
 /**
- * Przyechwytywanie niektórych wyjątków w celu wyświetlenia spersonalizowanej strony błędu.
+ * Custom exceptions listener.
+ *
  * @author Rafał Mikołajun <rafal@vision-web.pl>
  * @package vSymfo Core Bundle
  * @subpackage EventListener
  */
-class ExceptionListener
+class ExceptionListener implements ContainerAwareInterface
 {
     /**
      * @var ContainerInterface
@@ -31,9 +33,9 @@ class ExceptionListener
     private $container;
 
     /**
-     * @param ContainerInterface $container
+     * {@inheritdoc}
      */
-    public function __construct(ContainerInterface $container)
+    public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
     }
