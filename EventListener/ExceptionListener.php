@@ -13,10 +13,12 @@
 namespace vSymfo\Bundle\CoreBundle\EventListener;
 
 use CCDNUser\SecurityBundle\Component\Listener\AccessDeniedExceptionFactory;
+use Liip\ThemeBundle\ActiveTheme;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\Security\Http\AccessMap;
 
 /**
  * Custom exceptions listener.
@@ -28,9 +30,36 @@ use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 class ExceptionListener implements ContainerAwareInterface
 {
     /**
+     * @var AccessMap
+     */
+    private $accessMap;
+
+    /**
      * @var ContainerInterface
      */
     private $container;
+
+    /**
+     * @var ActiveTheme
+     */
+    private $activeTheme;
+
+    /**
+     * @var string
+     */
+    private $backendTheme;
+
+    /**
+     * @param AccessMap $accessMap
+     * @param ActiveTheme $activeTheme
+     * @param string $backendTheme
+     */
+    public function __construct(AccessMap $accessMap, ActiveTheme $activeTheme, $backendTheme)
+    {
+        $this->accessMap = $accessMap;
+        $this->activeTheme = $activeTheme;
+        $this->backendTheme = $backendTheme;
+    }
 
     /**
      * {@inheritdoc}
@@ -45,6 +74,22 @@ class ExceptionListener implements ContainerAwareInterface
      */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
+        $isPanel = false;
+        foreach ($this->accessMap->getPatterns($event->getRequest()) as $pattern) {
+            if (is_array($pattern)) {
+                foreach ($pattern as $role) {
+                    if (is_string($role) && $role === 'ROLE_PANEL_ACCESS') {
+                        $isPanel = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if ($isPanel) {
+            $this->activeTheme->setName('backend_' . $this->backendTheme);
+        }
+
         $this->loginBlockedException($event);
     }
 

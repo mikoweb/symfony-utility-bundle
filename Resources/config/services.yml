@@ -15,6 +15,7 @@ services:
     # Theme groups listener
     vsymfo_core.event.listener.themegroup:
         class: vSymfo\Bundle\CoreBundle\EventListener\ThemeGroupListener
+        arguments: ["@liip_theme.active_theme", "@router"]
         calls:
             - [setContainer, ["@service_container"]]
         tags:
@@ -23,6 +24,10 @@ services:
     # Custom error pages.
     vsymfo_core.event.listener.exception:
         class:  vSymfo\Bundle\CoreBundle\EventListener\ExceptionListener
+        arguments:
+            - "@security.access_map"
+            - "@liip_theme.active_theme"
+            - "%vsymfo_core.theme_backend%"
         calls:
             - [setContainer, ["@service_container"]]
         tags:

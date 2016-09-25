@@ -35,16 +35,24 @@ class ThemeGroupListener implements ContainerAwareInterface
     protected $container;
 
     /**
-     * Usługa Liip Theme
      * @var ActiveTheme
      */
     protected $theme;
 
     /**
-     * Router
      * @var RouterInterface
      */
     protected $router;
+
+    /**
+     * @param ActiveTheme $theme
+     * @param RouterInterface $router
+     */
+    public function __construct(ActiveTheme $theme, RouterInterface $router)
+    {
+        $this->theme = $theme;
+        $this->router = $router;
+    }
 
     /**
      * {@inheritdoc}
@@ -52,8 +60,6 @@ class ThemeGroupListener implements ContainerAwareInterface
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
-        $this->theme = $container->get('liip_theme.active_theme');
-        $this->router = $container->get('router');
     }
 
     /**
