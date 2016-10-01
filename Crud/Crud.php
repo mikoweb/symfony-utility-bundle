@@ -47,8 +47,11 @@ class Crud extends CrudAbstract
         $data = new Data();
         $entity = $this->getManager()->createEntity();
         $data->setEntity($entity);
+        $options['route_params'] = empty($options['route_params']) ? function () {
+            return [];
+        } : $options['route_params'];
         $form = $this->getManager()->buildForm($entity, array_merge($options['form_options'], [
-            'action' => $this->generateUrl($this->storeRoute()),
+            'action' => $this->generateUrl($this->storeRoute(), $this->routeParameters($data, $options)),
         ]), $options['form_type']);
         $data->setForm($form);
         $dispatcher = new EventDispatcher();
@@ -68,6 +71,9 @@ class Crud extends CrudAbstract
         $options = $this->commonOptionsResolver()->resolve($options);
         $data = new Data();
         $entity = $this->getManager()->createEntity();
+        $options['route_params'] = empty($options['route_params']) ? function () {
+            return [];
+        } : $options['route_params'];
         $form = $this->getManager()->buildForm($entity, $options['form_options'], $options['form_type']);
         $data->setEntity($entity);
         $data->setForm($form);
@@ -88,7 +94,8 @@ class Crud extends CrudAbstract
 
             $this->redirectAfterSave($data, $options);
         } else {
-            $data->setResponse($this->formRedirect($request, $this->createRoute()));
+            $data->setResponse($this->formRedirect($request, $this->createRoute(),
+                array_merge($request->query->all(), $this->routeParameters($data, $options))));
         }
 
         return $data;
@@ -156,7 +163,7 @@ class Crud extends CrudAbstract
             $this->redirectAfterSave($data, $options);
         } else {
             $data->setResponse($this->formRedirect($request, $this->editRoute(),
-                $this->routeParameters($data, $options)));
+                array_merge($request->query->all(), $this->routeParameters($data, $options))));
         }
 
         return $data;
