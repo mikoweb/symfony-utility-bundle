@@ -155,7 +155,7 @@ class Crud extends CrudAbstract
 
             $this->redirectAfterSave($data, $options);
         } else {
-            $data->setResponse($this->formRedirect($request, $this->editRoute(), 
+            $data->setResponse($this->formRedirect($request, $this->editRoute(),
                 $this->routeParameters($data, $options)));
         }
 
@@ -199,11 +199,13 @@ class Crud extends CrudAbstract
             'add_flash' => true,
             'redirect_url' => null,
             'route_params' => null,
+            'redirect_cancel_url' => null,
         ]);
         $resolver->setAllowedTypes('events', 'array');
         $resolver->setAllowedTypes('form_options', 'array');
         $resolver->setAllowedTypes('add_flash', 'bool');
         $resolver->setAllowedTypes('redirect_url', ['string', 'null']);
+        $resolver->setAllowedTypes('redirect_cancel_url', ['string', 'null']);
         $resolver->setAllowedTypes('route_params', ['callable', 'null']);
 
         return $resolver;
@@ -224,10 +226,10 @@ class Crud extends CrudAbstract
 
     /**
      * Returns params required to generate url eq. edit route.
-     * 
+     *
      * @param DataInterface $data
      * @param array $options
-     * 
+     *
      * @return array
      */
     protected function routeParameters(DataInterface $data, array $options)
