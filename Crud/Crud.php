@@ -71,9 +71,6 @@ class Crud extends CrudAbstract
         $options = $this->commonOptionsResolver()->resolve($options);
         $data = new Data();
         $entity = $this->getManager()->createEntity();
-        $options['route_params'] = empty($options['route_params']) ? function () {
-            return [];
-        } : $options['route_params'];
         $form = $this->getManager()->buildForm($entity, $options['form_options'], $options['form_type']);
         $data->setEntity($entity);
         $data->setForm($form);
