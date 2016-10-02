@@ -31,6 +31,7 @@ class Crud extends CrudAbstract
      */
     public function index(Request $request, array $options = [])
     {
+        $options = $this->commonOptionsResolver()->resolve($options);
         $data = new Data();
         $data->setCollection($this->getManager()->getPagination($request,
             $this->container->getParameter('vsymfo_core.pagination.limit')));
@@ -45,7 +46,7 @@ class Crud extends CrudAbstract
     {
         $options = $this->commonOptionsResolver()->resolve($options);
         $data = new Data();
-        $entity = $this->getManager()->createEntity();
+        $entity = $options['entity'] ? $options['entity'] : $this->getManager()->createEntity();
         $data->setEntity($entity);
         $options['route_params'] = empty($options['route_params']) ? function () {
             return [];
@@ -70,7 +71,7 @@ class Crud extends CrudAbstract
     {
         $options = $this->commonOptionsResolver()->resolve($options);
         $data = new Data();
-        $entity = $this->getManager()->createEntity();
+        $entity = $options['entity'] ? $options['entity'] : $this->getManager()->createEntity();
         $form = $this->getManager()->buildForm($entity, $options['form_options'], $options['form_type']);
         $data->setEntity($entity);
         $data->setForm($form);
@@ -103,8 +104,9 @@ class Crud extends CrudAbstract
      */
     public function show(Request $request, array $options = [])
     {
+        $options = $this->commonOptionsResolver()->resolve($options);
         $data = new Data();
-        $data->setEntity($this->getManager()->findEntity($request));
+        $data->setEntity($this->getEntity($request, $options));
 
         return $data;
     }
@@ -116,7 +118,7 @@ class Crud extends CrudAbstract
     {
         $options = $this->commonOptionsResolver()->resolve($options);
         $data = new Data();
-        $entity = $this->getManager()->findEntity($request);
+        $entity = $this->getEntity($request, $options);
         $data->setEntity($entity);
         $form = $this->getManager()->buildForm($entity, array_merge($options['form_options'], [
             'action' => $this->generateUrl($this->updateRoute(), $this->routeParameters($data, $options)),
@@ -138,7 +140,7 @@ class Crud extends CrudAbstract
     {
         $options = $this->commonOptionsResolver()->resolve($options);
         $data = new Data();
-        $entity = $this->getManager()->findEntity($request);
+        $entity = $this->getEntity($request, $options);
         $form = $this->getManager()->buildForm($entity, $options['form_options'], $options['form_type']);
         $data->setEntity($entity);
         $data->setForm($form);
@@ -173,7 +175,7 @@ class Crud extends CrudAbstract
     {
         $options = $this->commonOptionsResolver()->resolve($options);
         $data = new Data();
-        $entity = $this->getManager()->findEntity($request);
+        $entity = $this->getEntity($request, $options);
         $data->setEntity($entity);
         $this->getManager()->remove($entity);
 
@@ -204,6 +206,7 @@ class Crud extends CrudAbstract
             'redirect_url' => null,
             'route_params' => null,
             'redirect_cancel_url' => null,
+            'entity' => null,
         ]);
         $resolver->setAllowedTypes('events', 'array');
         $resolver->setAllowedTypes('form_options', 'array');
@@ -211,6 +214,7 @@ class Crud extends CrudAbstract
         $resolver->setAllowedTypes('redirect_url', ['string', 'null']);
         $resolver->setAllowedTypes('redirect_cancel_url', ['string', 'null']);
         $resolver->setAllowedTypes('route_params', ['callable', 'null']);
+        $resolver->setAllowedTypes('entity', ['object', 'null']);
 
         return $resolver;
     }
@@ -256,5 +260,16 @@ class Crud extends CrudAbstract
         } else {
             $data->setResponse($this->redirect($options['redirect_url']));
         }
+    }
+
+    /**
+     * @param Request $request
+     * @param array $options
+     *
+     * @return object
+     */
+    protected function getEntity(Request $request, array $options)
+    {
+        return $options['entity'] ? $options['entity'] : $this->getManager()->findEntity($request);
     }
 }
