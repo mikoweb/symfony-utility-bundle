@@ -144,12 +144,9 @@ class HtmlDocumentService implements DocumentFactoryInterface
         $jsloader = $this->getJsLoader();
         $script = $document->element('script');
         $twig = $this->twig;
-        $params = $this->params;
-        $appPaths = $this->appPaths;
-        $theme = $this->theme;
         $env = $this->env;
         $document->setScriptOutput(function (JavaScriptResourceManager $manager, array $translations)
-            use($jsloader, $params, $script, $twig, $appPaths, $theme, $env)
+            use($jsloader, $script, $twig, $env)
         {
             $output = $jsloader->render('html');
 
@@ -163,22 +160,10 @@ class HtmlDocumentService implements DocumentFactoryInterface
                 }
             }
 
-            $output .= '<script type="text/javascript">';
-            $output .= $twig->render('::head.js.twig', [
+            $output .= $twig->render('::head.html.twig', [
                 "resources" => $manager->render('array'),
                 "translations" => $translations,
-                "timeout" => (int)$params['resources_loading_timeout'],
-                "theme_name" => $theme->getName(),
-                "path" => [
-                    "base" => $appPaths->url("base"),
-                    "theme" => $appPaths->url("web_theme"),
-                    "resources" => $appPaths->url("web_resources"),
-                    "cdn_javascript" => $params['cdn_enable'] ? $params['cdn_javascript'] : '',
-                    "cdn_css" => $params['cdn_enable'] ? $params['cdn_css'] : '',
-                    "cdn_image" => $params['cdn_enable'] ? $params['cdn_image'] : '',
-                ]
             ]);
-            $output .= '</script>';
 
             if (!$script->isEmpty()) {
                 $output .= '<script type="text/javascript">' . $script->render() . '</script>';

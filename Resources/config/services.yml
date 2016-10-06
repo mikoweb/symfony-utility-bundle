@@ -39,3 +39,18 @@ services:
         arguments: ["@twig", "%kernel.debug%"]
         calls:
             - [setContainer, ["@service_container"]]
+
+    vsymfo_core.webui_service:
+        class: vSymfo\Bundle\CoreBundle\Service\WebuiService
+        arguments:
+            - "%vsymfo_core.document%"
+            - "@app_path"
+            - "@liip_theme.active_theme"
+            - "@request_stack"
+            - "%kernel.environment%"
+
+    vsymfo_core.twig.webui:
+        class: vSymfo\Bundle\CoreBundle\TwigExtension\WebuiExtension
+        arguments: ["@vsymfo_core.webui_service"]
+        tags:
+            - { name: twig.extension }
