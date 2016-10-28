@@ -129,7 +129,13 @@ class HtmlDocumentService implements DocumentFactoryInterface
         $document->resources("javascript")->chooseOnAdd("default");
         $document->resources("stylesheet")->chooseOnAdd("default");
 
-        $locator = new FileLocator($this->appPaths->getRootDir() . '/document');
+        $configDir = $this->appPaths->getRootDir() . '/document';
+
+        if (file_exists($configDir . '/' . $this->theme->getName())) {
+            $configDir .= '/' . $this->theme->getName();
+        }
+
+        $locator = new FileLocator($configDir);
         $loader = $utility->createResourcesLoader($document, 'javascript', $locator, '/');
         $loader->load('html_resources.yml', 'framework');
         $loader->load('html_resources.yml', 'core');
@@ -201,7 +207,7 @@ class HtmlDocumentService implements DocumentFactoryInterface
      */
     public function getPreprocessorData()
     {
-        $commonUrl = $this->appPaths->url('web_theme') . '/';  
+        $commonUrl = $this->appPaths->url('web_theme') . '/';
 
         return [
             'variables' => [
