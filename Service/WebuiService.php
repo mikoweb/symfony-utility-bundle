@@ -159,7 +159,8 @@ class WebuiService
      */
     protected function getCacheFileName($fileName)
     {
-        return $this->appPaths->getCacheDir() . '/vsymfo_webui_config/' . str_replace(['/', '\\', '.'], '_', $fileName);
+        return $this->appPaths->getCacheDir() . '/vsymfo_webui_config/' . $this->theme->getName() . '/' .
+            str_replace(['/', '\\', '.'], '_', $fileName);
     }
 
     /**
