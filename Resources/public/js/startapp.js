@@ -47,10 +47,11 @@ function startapp (data) {
     });
 
     jsloader.onLoad('core', function () {
-        jQuery.app.define("locale", data.locale);
-        jQuery.app.define("path_base", data.path.base);
-        jQuery.app.define("path_theme", data.path.theme);
-        jQuery.app.define("path_resources", data.path.resources);
+        jQuery.app.define('root', data.root);
+        jQuery.app.define('locale', data.locale);
+        jQuery.app.define('path_base', data.path.base);
+        jQuery.app.define('path_theme', data.path.theme);
+        jQuery.app.define('path_resources', data.path.resources);
         jQuery.app.trans.add(data.translations);
     });
 
