@@ -28,13 +28,15 @@ function startapp (data) {
         jsloader.add('core', [publicWebUi + '/jquery.mobile.only-events.min.js'], true);
     }
 
-    for (i = 0; i < data.res.unknown.length; i++) {
-        jsloader.add('', data.res.unknown[i].url, data.res.unknown[i].url.async);
+    if (data.res.unknown) {
+        for (i = 0; i < data.res.unknown.length; i++) {
+            jsloader.add('', data.res.unknown[i].url, data.res.unknown[i].url.async);
+        }
     }
 
     jsloader.onLoad('framework', function () {
         require(['webui-vendor'], function (vendor) {
-            vendor(data.path.cdn_javascript + data.path.resources, data.locale, data.requirejs);
+            vendor(data.path.cdn_javascript + data.path.lib, data.locale, data.requirejs);
         });
 
         require(['webui-cssloader'], function (loader) {
@@ -52,6 +54,7 @@ function startapp (data) {
         jQuery.app.define('path_base', data.path.base);
         jQuery.app.define('path_theme', data.path.theme);
         jQuery.app.define('path_resources', data.path.resources);
+        jQuery.app.define('path_lib', data.path.lib);
         jQuery.app.trans.add(data.translations);
     });
 

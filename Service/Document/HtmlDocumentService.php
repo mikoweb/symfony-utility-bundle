@@ -220,7 +220,7 @@ class HtmlDocumentService implements DocumentFactoryInterface
                 $this->appPaths->absolute('private_theme') . ApplicationPaths::WEBUI .'/' => $commonUrl,
                 $this->appPaths->getPrivateDir() . '/' => $commonUrl,
                 $this->appPaths->absolute('webui') . '/' => $commonUrl,
-                $this->appPaths->absolute('bower_components') . '/' => $commonUrl,
+                $this->appPaths->absolute('node_modules') . '/' => $commonUrl,
             ],
         ];
     }

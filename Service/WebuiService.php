@@ -85,34 +85,37 @@ class WebuiService
     /**
      * Returns json string with WebUI config.
      *
-     * @param string $jsonFilePath  Path to parse json file with WebUI config.
-     * @param array $options Required options eg. resources, translations.
-     * @param array $extend  Additional params.
+     * @param boolean $useRequirejsRc Is use file .requirejsrc.
+     * @param string $jsonFilePath    Path to parse json file with WebUI config.
+     * @param array $options          Required options eg. resources, translations.
+     * @param array $extend           Additional params.
      *
      * @return string
      */
-    public function startApp($jsonFilePath, array $options, array $extend = [])
+    public function startApp($useRequirejsRc, $jsonFilePath, array $options, array $extend = [])
     {
         $path = $this->getCacheFileName($jsonFilePath);
         $cache = new ConfigCache($path, $this->env === 'dev');
 
         if (!$cache->isFresh()) {
             $resource = new FileResource($this->getSrcFileName($jsonFilePath));
-            $content = $this->generateConfig($jsonFilePath, $options, $extend);
-            $cache->write($content, [$resource]);
+            $resourceRc = new FileResource($this->getRequirejsRcFile());
+            $content = $this->generateConfig($useRequirejsRc, $jsonFilePath, $options, $extend);
+            $cache->write($content, [$resource, $resourceRc]);
         }
 
         return file_get_contents($path);
     }
 
     /**
+     * @param boolean $useRequirejsRc
      * @param string $jsonFilePath
      * @param array $options
      * @param array $extend
      *
      * @return string
      */
-    protected function generateConfig($jsonFilePath, array $options, array $extend = [])
+    protected function generateConfig($useRequirejsRc, $jsonFilePath, array $options, array $extend = [])
     {
         $jsonFile = $this->getSrcFileName($jsonFilePath);
 
@@ -124,6 +127,22 @@ class WebuiService
 
         if (!is_array($json)) {
             throw new \UnexpectedValueException('File ' . $jsonFile . ' is invalid.');
+        }
+
+        if ($useRequirejsRc) {
+            $rcFile = $this->getRequirejsRcFile();
+
+            if (!file_exists($rcFile)) {
+                throw new \UnexpectedValueException('Not found file: ' . $rcFile);
+            }
+
+            $rcData = json_decode(file_get_contents($rcFile), true);
+
+            if (!is_array($rcData)) {
+                throw new \UnexpectedValueException('File ' . $rcFile . ' is invalid.');
+            }
+        } else {
+            $rcData = [];
         }
 
         $params = $this->resolver->resolve($options);
@@ -138,6 +157,7 @@ class WebuiService
                 'base' => $basePath,
                 'theme' => $this->appPaths->url('web_theme'),
                 'resources' => $this->appPaths->url('web_resources'),
+                'lib' => $this->appPaths->url('web_resources') . '/lib',
                 'cdn_javascript' => $this->params['cdn_enable'] ? $this->params['cdn_javascript'] : '',
                 'cdn_css' => $this->params['cdn_enable'] ? $this->params['cdn_css'] : '',
                 'cdn_image' => $this->params['cdn_enable'] ? $this->params['cdn_image'] : '',
@@ -147,7 +167,7 @@ class WebuiService
             ]
         ];
 
-        $config = array_merge_recursive($defaults, $json, $extend);
+        $config = array_merge_recursive($defaults, ['requirejs' => $rcData], $json, $extend);
 
         return json_encode($config, JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS);
     }
@@ -171,5 +191,13 @@ class WebuiService
     protected function getSrcFileName($fileName)
     {
         return $this->appPaths->getRootDir() . '/' . $fileName;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getRequirejsRcFile()
+    {
+        return $this->appPaths->getRootDir() . '/../.requirejsrc';
     }
 }

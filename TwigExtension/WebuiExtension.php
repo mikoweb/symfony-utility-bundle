@@ -47,15 +47,16 @@ class WebuiExtension extends \Twig_Extension
     /**
      * Returns json string with WebUI config.
      *
-     * @param string $jsonFilePath  Path to parse json file with WebUI config.
-     * @param array $options Required options eg. resources, translations.
-     * @param array $extend  Additional params.
+     * @param boolean $useRequirejsRc   Is use file .requirejsrc.
+     * @param string $jsonFilePath      Path to parse json file with WebUI config.
+     * @param array $options            Required options eg. resources, translations.
+     * @param array $extend             Additional params.
      *
      * @return string
      */
-    public function startApp($jsonFilePath, array $options, array $extend = [])
+    public function startApp($useRequirejsRc, $jsonFilePath, array $options, array $extend = [])
     {
-        return $this->webuiService->startApp($jsonFilePath, $options, $extend);
+        return $this->webuiService->startApp($useRequirejsRc, $jsonFilePath, $options, $extend);
     }
 
     /**
