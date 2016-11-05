@@ -54,3 +54,7 @@ services:
         arguments: ["@vsymfo_core.webui_service"]
         tags:
             - { name: twig.extension }
+
+    vsymfo_core.rest_form_service:
+        class: vSymfo\Bundle\CoreBundle\Service\RESTFormService
+        arguments: ["@twig"]
