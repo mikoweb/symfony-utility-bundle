@@ -73,7 +73,10 @@ class RESTFormService
         }
 
         if ($addErrors === true) {
-            $data[$this->getMessageAttr()] = $this->errors($form);
+            $errors = $this->errors($form);
+            if (!empty($errors)) {
+                $data[$this->getMessageAttr()] = $errors;
+            }
         }
 
         if ($template !== null) {
