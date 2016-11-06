@@ -14,6 +14,7 @@ namespace vSymfo\Bundle\CoreBundle\Service;
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Rafał Mikołajun <rafal@vision-web.pl>
@@ -109,6 +110,33 @@ class RESTFormService
         $this->childrenErrors($errors, $view, isset($view->vars['name']) ? $view->vars['name'] : '.');
 
         return $errors;
+    }
+
+    /**
+     * Generate first form item from request.
+     *
+     * @param Request $request
+     * @param Form $form
+     * @param string $field
+     * @param mixed $data
+     *
+     * @return array
+     */
+    public function firstItem(Request $request, Form $form, $field, $data)
+    {
+        $item = [];
+        $content = json_decode($request->getContent());
+
+        if (is_object($content) && isset($content->{$form->getName()})
+            && isset($content->{$form->getName()}->{$field})
+        ) {
+            $key = key($content->{$form->getName()}->{$field});
+            if (!is_null($key)) {
+                $item[$field][$key] = $data;
+            }
+        }
+
+        return $item;
     }
 
     /**
