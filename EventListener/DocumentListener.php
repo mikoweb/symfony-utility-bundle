@@ -94,8 +94,11 @@ class DocumentListener implements ContainerAwareInterface
 
             if (!empty($route))  {
                 $defaultFormat = is_null($route->getDefault('_format')) ? 'html' : $route->getDefault('_format');
-                $format = !is_null($request->attributes->get('_format')) ? $request->attributes->get('_format') : $defaultFormat;
+            } else {
+                $defaultFormat = 'html';
             }
+
+            $format = !is_null($request->attributes->get('_format')) ? $request->attributes->get('_format') : $defaultFormat;
         }
 
         if (!is_null($format)) {

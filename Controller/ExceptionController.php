@@ -16,6 +16,7 @@ use Symfony\Bundle\TwigBundle\Controller\ExceptionController as EC;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -43,26 +44,35 @@ abstract class ExceptionControllerBase extends EC implements ContainerAwareInter
     }
 
     /**
+     * @param Response $response
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function responseErrorPage(Request $request, Response $response)
+    {
+        $docListener = new DocumentListener(null, 'exception_document');
+        $docListener->setContainer($this->container);
+        $event = new GetResponseEvent($this->container->get('kernel'), $request, HttpKernelInterface::MASTER_REQUEST);
+        $docListener->onKernelRequest($event);
+        $this->container->get('exception_document')->body($response->getContent());
+        $response->setContent($this->container->get('exception_document')->render());
+
+        return $response;
+    }
+
+    /**
      * @param Request $request
      * @param $exception
      * @param DebugLoggerInterface|null $logger
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     protected function _showAction(Request $request, $exception, DebugLoggerInterface $logger = null)
     {
-        if ($request->get('format', 'html') === 'html' && $this->container->get('kernel')->getEnvironment() === 'prod') {
-            // trzeba utworzyć dodatkową usługę dokumentu
-            $docListener = new DocumentListener('html', 'exception_document');
-            $docListener->setContainer($this->container);
-            $event = new GetResponseEvent($this->container->get('kernel'), $request, HttpKernelInterface::MASTER_REQUEST);
-            $docListener->onKernelRequest($event);
-
+        if ($this->container->get('kernel')->getEnvironment() === 'prod') {
             $response = parent::showAction($request, $exception, $logger);
-            $this->container->get('exception_document')->body($response->getContent());
-            $response->setContent($this->container->get('exception_document')->render());
-
-            return $response;
+            return $this->responseErrorPage($request, $response);
         }
 
         return parent::showAction($request, $exception, $logger);

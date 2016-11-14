@@ -16,7 +16,6 @@ use CCDNUser\SecurityBundle\Component\Listener\AccessDeniedExceptionFactory;
 use Liip\ThemeBundle\ActiveTheme;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\Security\Http\AccessMap;
 
@@ -94,7 +93,8 @@ class ExceptionListener implements ContainerAwareInterface
     }
 
     /**
-     * Wyświetl komunikat o czasowym zablokowaniu możliwości logowania
+     * Login blocked error page.
+     *
      * @param GetResponseForExceptionEvent $event
      */
     private function loginBlockedException(GetResponseForExceptionEvent $event)
@@ -103,7 +103,9 @@ class ExceptionListener implements ContainerAwareInterface
         $factory = new AccessDeniedExceptionFactory();
         $cmp = $factory->createAccessDeniedException();
         if (get_class($exception) === get_class($cmp) && $cmp->getCode() === $exception->getCode() && $cmp->getMessage() === $exception->getMessage()) {
-            $event->setResponse(new RedirectResponse($this->container->get('router')->generate("vsymfo_exception_login_blocked")));
+            $response = $this->container->get('vsymfo_core.controller.login_blocked')->loginBlockedAction();
+            $event->setResponse($this->container->get('vsymfo_core.twig.exception_controller')
+                ->responseErrorPage($event->getRequest(), $response));
         }
     }
 }
