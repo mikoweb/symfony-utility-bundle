@@ -208,6 +208,9 @@ class HtmlDocumentService implements DocumentFactoryInterface
     public function getPreprocessorData()
     {
         $commonUrl = $this->appPaths->url('web_theme') . '/';
+        $themePath = $this->appPaths->absolute('private_theme');
+        $themeExtraPath = preg_replace('/^(.*)(' . str_replace('/', '\/', ApplicationPaths::WEB_THEMES) . '\/)([^\/]+)$/',
+            '${1}' . ApplicationPaths::WEB_THEMES . '_extra/${3}', $themePath);
 
         return [
             'variables' => [
@@ -216,8 +219,11 @@ class HtmlDocumentService implements DocumentFactoryInterface
                 'path-resources' => '"' . $this->appPaths->url('web_resources') . '"'
             ],
             'import_dirs' => [
-                $this->appPaths->absolute('private_theme') . '/src/' => $commonUrl,
-                $this->appPaths->absolute('private_theme') . ApplicationPaths::WEBUI .'/' => $commonUrl,
+                $themeExtraPath . '/src/' => $commonUrl,
+                $themeExtraPath . ApplicationPaths::WEBUI .'/' => $commonUrl,
+                $themePath . '/extra/' => $commonUrl,
+                $themePath . '/src/' => $commonUrl,
+                $themePath . ApplicationPaths::WEBUI .'/' => $commonUrl,
                 $this->appPaths->getPrivateDir() . '/' => $commonUrl,
                 $this->appPaths->absolute('webui') . '/' => $commonUrl,
                 $this->appPaths->absolute('node_modules') . '/' => $commonUrl,
