@@ -56,6 +56,11 @@ class HtmlDocumentService implements DocumentFactoryInterface
     protected $twig;
 
     /**
+     * @var \Twig_Loader_Filesystem
+     */
+    protected $twigLoader;
+
+    /**
      * @var ActiveTheme
      */
     protected $theme;
@@ -71,6 +76,7 @@ class HtmlDocumentService implements DocumentFactoryInterface
      * @param array $params
      * @param RequestStack $requestStack
      * @param \Twig_Environment $twig
+     * @param \Twig_Loader_Filesystem $twigLoader
      * @param ActiveTheme $theme
      * @param TranslatorInterface $translator
      */
@@ -80,6 +86,7 @@ class HtmlDocumentService implements DocumentFactoryInterface
         array $params,
         RequestStack $requestStack,
         \Twig_Environment $twig,
+        \Twig_Loader_Filesystem $twigLoader,
         ActiveTheme $theme,
         TranslatorInterface $translator
     ) {
@@ -88,6 +95,7 @@ class HtmlDocumentService implements DocumentFactoryInterface
         $this->params = $params;
         $this->requestStack = $requestStack;
         $this->twig = $twig;
+        $this->twigLoader = $twigLoader;
         $this->theme = $theme;
         $this->translator = $translator;
     }
@@ -111,17 +119,29 @@ class HtmlDocumentService implements DocumentFactoryInterface
 
         // favicon
         $favicon = $document->element('favicon');
-        $favicon->enable($this->params["favicon_enable"]);
-        $favicon->setBasePath($this->appPaths->url('web_theme') . '/favicons');
-        $favicon->setTileColor($this->params["favicon_tile_color"]);
-        if (file_exists($this->appPaths->absolute('web_theme') . '/favicons/favicon.html')) {
-            $favicon->setFaviconTemplate(file_get_contents($this->appPaths->absolute('web_theme') . '/favicons/favicon.html'));
+        if ($this->params["favicon_enable"]) {
+            $favicon->enable(true);
+            $favicon->setBasePath($this->appPaths->url('web_theme') . '/favicons');
+            $favicon->setTileColor($this->params["favicon_tile_color"]);
+            if (file_exists($this->appPaths->absolute('web_theme') . '/favicons/favicon.html')) {
+                $favicon->setFaviconTemplate(file_get_contents($this->appPaths->absolute('web_theme') . '/favicons/favicon.html'));
+            }
+        } else {
+            $favicon->enable(false);
         }
 
         // html lang
         $document->element('html')->attr('lang', $this->requestStack->getCurrentRequest()->getLocale());
 
         // resources
+        if ($this->twigLoader->exists('::before-stylesheets.html.twig')) {
+            $document->beforeStyleSheets($this->twig->render('::before-stylesheets.html.twig'));
+        }
+
+        if ($this->twigLoader->exists('::after-stylesheets.html.twig')) {
+            $document->afterStyleSheets($this->twig->render('::after-stylesheets.html.twig'));
+        }
+
         $utility = $this->getUtility($this->params);
         $utility->createResOnAdd($document, "javascript", "default");
         $utility->createResOnAdd($document, "stylesheet", "default");
@@ -146,40 +166,45 @@ class HtmlDocumentService implements DocumentFactoryInterface
         $loader = $utility->createResourcesLoader($document, 'javascript', $locator, $this->appPaths->getThemePath() . '/src');
         $loader->load('html_resources.yml', 'theme');
 
-        // js initializer
-        $jsloader = $this->getJsLoader();
-        $script = $document->element('script');
-        $twig = $this->twig;
-        $env = $this->env;
-        $document->setScriptOutput(function (JavaScriptResourceManager $manager, array $translations)
+        if (!in_array('jsloader', $this->params['disabled'], true)) {
+            $document->setScriptsLocation(HtmlDocument::SCRIPTS_LOCATION_TOP);
+            // js initializer
+            $jsloader = $this->getJsLoader();
+            $script = $document->element('script');
+            $twig = $this->twig;
+            $env = $this->env;
+            $document->setScriptOutput(function (JavaScriptResourceManager $manager, array $translations)
             use($jsloader, $script, $twig, $env)
-        {
-            $output = $jsloader->render('html');
+            {
+                $output = $jsloader->render('html');
 
-            if ($env === 'dev') {
-                foreach ($jsloader->resources() as $resource) {
-                    if ($resource instanceof CombineResourceInterface
-                        && $resource->getCombineObject()->getException() instanceof \Exception
-                    ) {
-                        throw $resource->getCombineObject()->getException();
+                if ($env === 'dev') {
+                    foreach ($jsloader->resources() as $resource) {
+                        if ($resource instanceof CombineResourceInterface
+                            && $resource->getCombineObject()->getException() instanceof \Exception
+                        ) {
+                            throw $resource->getCombineObject()->getException();
+                        }
                     }
                 }
-            }
 
-            $output .= $twig->render('::head.html.twig', [
-                "resources" => $manager->render('array'),
-                "translations" => $translations,
-            ]);
+                $output .= $twig->render('::head.html.twig', [
+                    "resources" => $manager->render('array'),
+                    "translations" => $translations,
+                ]);
 
-            if (!$script->isEmpty()) {
-                $output .= '<script type="text/javascript">' . $script->render() . '</script>';
-                $script->update(function ()  {
-                    return '';
-                });
-            }
+                if (!$script->isEmpty()) {
+                    $output .= '<script type="text/javascript">' . $script->render() . '</script>';
+                    $script->update(function ()  {
+                        return '';
+                    });
+                }
 
-            return $output;
-        });
+                return $output;
+            });
+        } else {
+            $document->setScriptsLocation(HtmlDocument::SCRIPTS_LOCATION_NONE);
+        }
 
         // translations used in theme
         if (file_exists($this->appPaths->absolute("kernel_root") . '/theme/' . $this->appPaths->getThemeName() . '/translations.yml')) {

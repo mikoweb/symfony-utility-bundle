@@ -28,6 +28,7 @@ services:
             - "%vsymfo_core.document%"
             - "@request_stack"
             - "@twig"
+            - "@twig.loader"
             - "@liip_theme.active_theme"
             - "@translator"
 
