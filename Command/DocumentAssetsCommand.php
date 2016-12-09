@@ -120,6 +120,7 @@ class DocumentAssetsCommand extends ContainerAwareCommand
             $params,
             $container->get('request_stack'),
             $container->get('twig'),
+            $container->get('twig.loader'),
             $container->get('liip_theme.active_theme'),
             $container->get('translator')
         );
