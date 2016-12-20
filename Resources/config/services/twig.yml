@@ -1,0 +1,33 @@
+services:
+    # Custom error pages controller.
+    vsymfo_core.twig.exception_controller:
+        class: vSymfo\Bundle\CoreBundle\Controller\ExceptionController
+        arguments: ["@twig", "%kernel.debug%"]
+        calls:
+            - [setContainer, ["@service_container"]]
+
+    vsymfo_core.twig.utilities:
+        class: vSymfo\Bundle\CoreBundle\TwigExtension\UtilitiesExtension
+        calls:
+            - [setContainer, ["@service_container"]]
+        tags:
+            - { name: twig.extension }
+
+    vsymfo_core.twig.webui:
+        class: vSymfo\Bundle\CoreBundle\TwigExtension\WebuiExtension
+        arguments: ["@vsymfo_core.webui_service"]
+        tags:
+            - { name: twig.extension }
+
+    vsymfo_core.twig.document:
+        class: vSymfo\Bundle\CoreBundle\TwigExtension\DocumentExtension
+        calls:
+            - [setContainer, ["@service_container"]]
+        tags:
+            - { name: twig.extension }
+
+    vsymfo_core.twig.theme:
+        class: vSymfo\Bundle\CoreBundle\TwigExtension\ThemeExtension
+        arguments: ["@assets.packages", "@app_path"]
+        tags:
+            - { name: twig.extension }

@@ -1,16 +1,12 @@
+imports:
+    - { resource: "services/twig.yml" }
+
 services:
     # Used to gets aplication paths.
     app_path:
         class: vSymfo\Core\ApplicationPaths
         calls:
             - [setContainer, ["@service_container"]]
-
-    vsymfo_core.twig.utilities:
-        class: vSymfo\Bundle\CoreBundle\TwigExtension\UtilitiesExtension
-        calls:
-            - [setContainer, ["@service_container"]]
-        tags:
-            - { name: twig.extension }
 
     # Theme groups listener
     vsymfo_core.event.listener.themegroup:
@@ -33,13 +29,6 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
 
-    # Custom error pages controller.
-    vsymfo_core.twig.exception_controller:
-        class: vSymfo\Bundle\CoreBundle\Controller\ExceptionController
-        arguments: ["@twig", "%kernel.debug%"]
-        calls:
-            - [setContainer, ["@service_container"]]
-
     vsymfo_core.webui_service:
         class: vSymfo\Bundle\CoreBundle\Service\WebuiService
         arguments:
@@ -48,19 +37,6 @@ services:
             - "@liip_theme.active_theme"
             - "@request_stack"
             - "%kernel.environment%"
-
-    vsymfo_core.twig.webui:
-        class: vSymfo\Bundle\CoreBundle\TwigExtension\WebuiExtension
-        arguments: ["@vsymfo_core.webui_service"]
-        tags:
-            - { name: twig.extension }
-
-    vsymfo_core.twig.document:
-        class: vSymfo\Bundle\CoreBundle\TwigExtension\DocumentExtension
-        calls:
-            - [setContainer, ["@service_container"]]
-        tags:
-            - { name: twig.extension }
 
     vsymfo_core.rest_form_service:
         class: vSymfo\Bundle\CoreBundle\Service\RESTFormService
