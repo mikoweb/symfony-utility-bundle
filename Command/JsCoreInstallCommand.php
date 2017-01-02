@@ -15,15 +15,15 @@ namespace vSymfo\Bundle\CoreBundle\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Process\Process;
 
 /**
  * @author Rafał Mikołajun <rafal@vision-web.pl>
  * @package vSymfo Core Bundle
  * @subpackage Command
  */
-class JsInstallCommand extends ContainerAwareCommand
+class JsCoreInstallCommand extends ContainerAwareCommand
 {
     /**
      * {@inheritdoc}
@@ -31,8 +31,8 @@ class JsInstallCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('vsymfo:js:install')
-            ->setDescription('Install application JavaScripts.')
+            ->setName('vsymfo:js-core:install')
+            ->setDescription('Install core JavaScripts.')
         ;
     }
 
@@ -42,23 +42,30 @@ class JsInstallCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $paths = $this->getContainer()->get('app_path');
-        $env = $input->getOption('env');
         $fs = new Filesystem();
-        $webPath = $paths->getWebDir() . '/js';
-        $privatePath = $paths->getPrivateDir() . '/js';
+        $packageSource = $paths->absolute('node_modules') . '/vsymfo-js-core/src';
+        $targetDir = $paths->getPrivateDir() . '/src';
 
-        if ($fs->exists($privatePath)) {
-            if ($fs->exists($webPath)) {
-                $fs->remove($webPath);
-            }
+        if (!$fs->exists($packageSource)) {
+            throw new FileNotFoundException("Source files not found.");
+        }
 
-            if ($env === 'prod') {
-                $fs->mirror($privatePath, $webPath);
-            } else {
-                $fs->symlink($privatePath, $webPath);
+        $toRemove = [
+            $targetDir . '/vsymfo',
+            $targetDir . '/.babelrc',
+            $targetDir . '/.eslintrc',
+            $targetDir . '/Gruntfile.js',
+            $targetDir . '/package.json',
+        ];
+
+        foreach ($toRemove as $path) {
+            if ($fs->exists($path)) {
+                $fs->remove($path);
             }
         }
 
-        $output->writeln('<fg=black;bg=green>JavaScripts installation successful.</>');
+        $fs->mirror($packageSource, $targetDir);
+
+        $output->writeln('<fg=black;bg=green>Core JavaScripts installation successful.</>');
     }
 }
