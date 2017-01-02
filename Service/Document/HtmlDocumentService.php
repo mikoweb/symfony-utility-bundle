@@ -166,7 +166,9 @@ class HtmlDocumentService implements DocumentFactoryInterface
         $loader = $utility->createResourcesLoader($document, 'javascript', $locator, $this->appPaths->getThemePath() . '/src');
         $loader->load('html_resources.yml', 'theme');
 
-        if (!in_array('jsloader', $this->params['disabled'], true)) {
+        if (!in_array('jsloader', $this->params['disabled'], true) ||
+            in_array($this->theme->getName(), $this->params['jsloader_themes'], true)
+        ) {
             $document->setScriptsLocation(HtmlDocument::SCRIPTS_LOCATION_TOP);
             // js initializer
             $jsloader = $this->getJsLoader();
