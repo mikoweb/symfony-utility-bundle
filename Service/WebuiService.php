@@ -15,8 +15,8 @@ namespace vSymfo\Bundle\CoreBundle\Service;
 use Liip\ThemeBundle\ActiveTheme;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 use vSymfo\Core\ApplicationPaths;
 
 /**
@@ -42,11 +42,6 @@ class WebuiService
     protected $theme;
 
     /**
-     * @var RequestStack
-     */
-    protected $request;
-
-    /**
      * @var OptionsResolver
      */
     protected $resolver;
@@ -57,23 +52,28 @@ class WebuiService
     protected $env;
 
     /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
      * @param array $params
      * @param ApplicationPaths $appPaths
      * @param ActiveTheme $theme
-     * @param RequestStack $requestStack
+     * @param TranslatorInterface $translator
      * @param string $env
      */
     public function __construct(
         array $params,
         ApplicationPaths $appPaths,
         ActiveTheme $theme,
-        RequestStack $requestStack,
+        TranslatorInterface $translator,
         $env
     ) {
         $this->params = $params;
         $this->appPaths = $appPaths;
         $this->theme = $theme;
-        $this->request = $requestStack;
+        $this->translator = $translator;
         $this->env = $env;
         $this->resolver = new OptionsResolver();
         $this->resolver->setRequired('resources');
@@ -151,7 +151,7 @@ class WebuiService
             'timeout' => (int) $this->params['resources_loading_timeout'],
             'res' => $params['resources'],
             'translations' => $params['translations'],
-            'locale' => $this->request->getCurrentRequest()->getLocale(),
+            'locale' => $this->translator->getLocale(),
             'theme_name' => $this->theme->getName(),
             'path' => [
                 'base' => $basePath,

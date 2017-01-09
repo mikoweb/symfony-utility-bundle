@@ -131,7 +131,7 @@ class HtmlDocumentService implements DocumentFactoryInterface
         }
 
         // html lang
-        $document->element('html')->attr('lang', $this->requestStack->getCurrentRequest()->getLocale());
+        $document->element('html')->attr('lang', $this->translator->getLocale());
 
         // resources
         if ($this->twigLoader->exists('::before-stylesheets.html.twig')) {

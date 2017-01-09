@@ -35,7 +35,7 @@ services:
             - "%vsymfo_core.document%"
             - "@app_path"
             - "@liip_theme.active_theme"
-            - "@request_stack"
+            - "@translator"
             - "%kernel.environment%"
 
     vsymfo_core.rest_form_service:
