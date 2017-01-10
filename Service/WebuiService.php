@@ -76,10 +76,12 @@ class WebuiService
         $this->translator = $translator;
         $this->env = $env;
         $this->resolver = new OptionsResolver();
-        $this->resolver->setRequired('resources');
-        $this->resolver->setRequired('translations');
+        $this->resolver->setDefault('resources', []);
+        $this->resolver->setDefault('translations', []);
+        $this->resolver->setDefault('minimal', false);
         $this->resolver->setAllowedTypes('resources', ['array']);
         $this->resolver->setAllowedTypes('translations', ['array']);
+        $this->resolver->setAllowedTypes('minimal', ['bool']);
     }
 
     /**
@@ -148,9 +150,6 @@ class WebuiService
         $params = $this->resolver->resolve($options);
         $basePath = $this->appPaths->getBasePath();
         $defaults = [
-            'timeout' => (int) $this->params['resources_loading_timeout'],
-            'res' => $params['resources'],
-            'translations' => $params['translations'],
             'locale' => $this->translator->getLocale(),
             'theme_name' => $this->theme->getName(),
             'path' => [
@@ -158,14 +157,21 @@ class WebuiService
                 'theme' => $this->appPaths->url('web_theme'),
                 'resources' => $this->appPaths->url('web_resources'),
                 'lib' => $this->appPaths->url('web_resources') . '/lib',
-                'cdn_javascript' => $this->params['cdn_enable'] ? $this->params['cdn_javascript'] : '',
-                'cdn_css' => $this->params['cdn_enable'] ? $this->params['cdn_css'] : '',
-                'cdn_image' => $this->params['cdn_enable'] ? $this->params['cdn_image'] : '',
             ],
             'requirejs' => [
                 'baseUrl' => $basePath . '/js',
             ]
         ];
+
+        if (!$params['minimal']) {
+            $defaults['timeout'] = (int) $this->params['resources_loading_timeout'];
+            $defaults['res'] = $params['resources'];
+            $defaults['path']['cdn_javascript'] = $this->params['cdn_enable']
+                ? $this->params['cdn_javascript'] : '';
+            $defaults['path']['cdn_css'] = $this->params['cdn_enable'] ? $this->params['cdn_css'] : '';
+            $defaults['path']['cdn_image'] = $this->params['cdn_enable'] ? $this->params['cdn_image'] : '';
+            $defaults['translations'] = $params['translations'];
+        }
 
         $config = array_merge_recursive($defaults, ['requirejs' => $rcData], $json, $extend);
 
@@ -180,7 +186,7 @@ class WebuiService
     protected function getCacheFileName($fileName)
     {
         return $this->appPaths->getCacheDir() . '/vsymfo_webui_config/' . $this->theme->getName() . '/' .
-            str_replace(['/', '\\', '.'], '_', $fileName);
+        $this->translator->getLocale() . '/' . str_replace(['/', '\\', '.'], '_', $fileName);
     }
 
     /**
