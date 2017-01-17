@@ -196,7 +196,7 @@ class RESTFormService
     {
         if (empty($view->children)) {
             $item = &$parent[$view->vars['name']];
-            if (!is_null($view->vars['data']) && is_scalar($view->vars['data'])) {
+            if (isset($view->vars['data']) && !is_null($view->vars['data']) && is_scalar($view->vars['data'])) {
                 $item = $view->vars['data'];
             } else {
                 $item = isset($view->vars['value']) ? $view->vars['value'] : null;
