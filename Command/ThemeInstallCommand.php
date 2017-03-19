@@ -71,7 +71,7 @@ class ThemeInstallCommand extends ContainerAwareCommand
         $extraPath = $paths->getPrivateDir() . '/theme_extra/' . $theme . '/public';
 
         if ($fs->exists($extraPath)) {
-            $fs->mirror($extraPath, $webPath);
+            $fs->mirror($extraPath, $webPath, null, ['override' => true]);
         }
 
         $output->writeln('<fg=black;bg=green>Theme "' . $theme . '" has been installed.</>');
