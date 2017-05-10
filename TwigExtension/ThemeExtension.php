@@ -61,7 +61,13 @@ class ThemeExtension extends \Twig_Extension
      */
     public function asset($path)
     {
-        return $this->packages->getUrl($this->paths->getThemePath() . (strpos($path, '/') === 0 ? null : '/' ) . $path);
+        $themePath = $this->paths->getThemePath();
+
+        if (strpos($themePath, '/') === 0) {
+            $themePath = substr($themePath, 1);
+        }
+
+        return $this->packages->getUrl($themePath . (strpos($path, '/') === 0 ? null : '/' ) . $path);
     }
 
     /**
