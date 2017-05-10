@@ -16,6 +16,7 @@ use Liip\ThemeBundle\ActiveTheme;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\TranslatorInterface;
+use vSymfo\Component\Document\CssPreprocessor\NodeSassPreprocessor;
 use vSymfo\Component\Document\FileLoader\TranslationLoader;
 use vSymfo\Component\Document\Format\HtmlDocument;
 use vSymfo\Component\Document\Resources\Interfaces\CombineResourceInterface;
@@ -106,6 +107,12 @@ class HtmlDocumentService implements DocumentFactoryInterface
     public function createDocument(array $options = [])
     {
         $document = new HtmlDocument();
+
+        if (isset($this->params['node_sass_run_mode']) && is_string($this->params['node_sass_run_mode'])
+            && !empty($this->params['node_sass_run_mode']))
+        {
+            NodeSassPreprocessor::setRunMode($this->params['node_sass_run_mode']);
+        }
 
         // used by Modernizr
         $document->element('html')->addClass('no-js');
