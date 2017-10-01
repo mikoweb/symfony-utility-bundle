@@ -12,7 +12,6 @@
 
 namespace vSymfo\Bundle\CoreBundle\EventListener;
 
-use CCDNUser\SecurityBundle\Component\Listener\AccessDeniedExceptionFactory;
 use Liip\ThemeBundle\ActiveTheme;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -87,25 +86,6 @@ class ExceptionListener implements ContainerAwareInterface
 
         if ($isPanel) {
             $this->activeTheme->setName('backend_' . $this->backendTheme);
-        }
-
-        $this->loginBlockedException($event);
-    }
-
-    /**
-     * Login blocked error page.
-     *
-     * @param GetResponseForExceptionEvent $event
-     */
-    private function loginBlockedException(GetResponseForExceptionEvent $event)
-    {
-        $exception = $event->getException();
-        $factory = new AccessDeniedExceptionFactory();
-        $cmp = $factory->createAccessDeniedException();
-        if (get_class($exception) === get_class($cmp) && $cmp->getCode() === $exception->getCode() && $cmp->getMessage() === $exception->getMessage()) {
-            $response = $this->container->get('vsymfo_core.controller.login_blocked')->loginBlockedAction();
-            $event->setResponse($this->container->get('vsymfo_core.twig.exception_controller')
-                ->responseErrorPage($event->getRequest(), $response));
         }
     }
 }
