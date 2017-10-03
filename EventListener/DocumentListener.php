@@ -50,6 +50,11 @@ class DocumentListener implements ContainerAwareInterface
     protected $serviceName;
 
     /**
+     * @var bool
+     */
+    protected $documentInitialized;
+
+    /**
      * @param string|null $forceFormat
      * @param string $serviceName
      */
@@ -58,9 +63,10 @@ class DocumentListener implements ContainerAwareInterface
         if (!is_string($serviceName)) {
             throw new \InvalidArgumentException('serviceName is not string');
         }
- 
+
         $this->forceFormat = is_string($forceFormat) ? $forceFormat : null;
         $this->serviceName = $serviceName;
+        $this->documentInitialized = false;
     }
 
     /**
@@ -77,44 +83,48 @@ class DocumentListener implements ContainerAwareInterface
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
-        $format = null;
+        if (!$this->documentInitialized) {
+            $format = null;
 
-        if (is_string($this->forceFormat)) {
-            $format = $this->forceFormat;
-        } else {
-            $request = $event->getRequest();
-
-            if ($this->router instanceof I18nRouter) {
-                $collection = $this->router->getOriginalRouteCollection();
+            if (is_string($this->forceFormat)) {
+                $format = $this->forceFormat;
             } else {
-                $collection = $this->router->getRouteCollection();
+                $request = $event->getRequest();
+
+                if ($this->router instanceof I18nRouter) {
+                    $collection = $this->router->getOriginalRouteCollection();
+                } else {
+                    $collection = $this->router->getRouteCollection();
+                }
+
+                $route = $collection->get($request->get('_route'));
+
+                if (!empty($route))  {
+                    $defaultFormat = is_null($route->getDefault('_format')) ? 'html' : $route->getDefault('_format');
+                } else {
+                    $defaultFormat = 'html';
+                }
+
+                $format = !is_null($request->attributes->get('_format')) ? $request->attributes->get('_format') : $defaultFormat;
             }
 
-            $route = $collection->get($request->get('_route'));
+            if (!is_null($format)) {
+                $serviceName = 'vsymfo_core.service.' . strtolower($format) . '_document';
 
-            if (!empty($route))  {
-                $defaultFormat = is_null($route->getDefault('_format')) ? 'html' : $route->getDefault('_format');
-            } else {
-                $defaultFormat = 'html';
+                if ($this->container->has($serviceName)
+                    && $this->container->get($serviceName) instanceof DocumentFactoryInterface
+                ) {
+                    $service = $this->container->get($serviceName);
+                } else {
+                    $service = $this->container->get('vsymfo_core.service.txt_document');
+                }
+
+                $doc = $service->createDocument();
+                $this->container->get('vsymfo_core.service.document')->setDefaultsToDocument($doc);
+                $this->container->set($this->serviceName, $doc);
             }
 
-            $format = !is_null($request->attributes->get('_format')) ? $request->attributes->get('_format') : $defaultFormat;
-        }
-
-        if (!is_null($format)) {
-            $serviceName = 'vsymfo_core.service.' . strtolower($format) . '_document';
-
-            if ($this->container->has($serviceName)
-                && $this->container->get($serviceName) instanceof DocumentFactoryInterface
-            ) {
-                $service = $this->container->get($serviceName);
-            } else {
-                $service = $this->container->get('vsymfo_core.service.txt_document');
-            }
-
-            $doc = $service->createDocument();
-            $this->container->get('vsymfo_core.service.document')->setDefaultsToDocument($doc);
-            $this->container->set($this->serviceName, $doc);
+            $this->documentInitialized = true;
         }
     }
 }
