@@ -149,70 +149,72 @@ class HtmlDocumentService implements DocumentFactoryInterface
             $document->afterStyleSheets($this->twig->render('::after-stylesheets.html.twig'));
         }
 
-        $utility = $this->getUtility($this->params);
-        $utility->createResOnAdd($document, "javascript", "default");
-        $utility->createResOnAdd($document, "stylesheet", "default");
+        if (!in_array('resources', $this->params['disabled'], true)) {
+            $utility = $this->getUtility($this->params);
+            $utility->createResOnAdd($document, "javascript", "default");
+            $utility->createResOnAdd($document, "stylesheet", "default");
 
-        $document->resources("javascript")->chooseOnAdd("default");
-        $document->resources("stylesheet")->chooseOnAdd("default");
+            $document->resources("javascript")->chooseOnAdd("default");
+            $document->resources("stylesheet")->chooseOnAdd("default");
 
-        $configDir = $this->appPaths->getRootDir() . '/document';
+            $configDir = $this->appPaths->getRootDir() . '/document';
 
-        if (file_exists($configDir . '/' . $this->theme->getName())) {
-            $configDir .= '/' . $this->theme->getName();
-        }
+            if (file_exists($configDir . '/' . $this->theme->getName())) {
+                $configDir .= '/' . $this->theme->getName();
+            }
 
-        $locator = new FileLocator($configDir);
-        $loader = $utility->createResourcesLoader($document, 'javascript', $locator, '/');
-        $loader->load('html_resources.yml', 'framework');
-        $loader->load('html_resources.yml', 'core');
+            $locator = new FileLocator($configDir);
+            $loader = $utility->createResourcesLoader($document, 'javascript', $locator, '/');
+            $loader->load('html_resources.yml', 'framework');
+            $loader->load('html_resources.yml', 'core');
 
-        $locator = new FileLocator($this->appPaths->absolute('private_theme'));
-        $loader = $utility->createResourcesLoader($document, 'stylesheet', $locator, $this->appPaths->getThemePath() . '/src');
-        $loader->load('html_resources.yml', 'theme');
-        $loader = $utility->createResourcesLoader($document, 'javascript', $locator, $this->appPaths->getThemePath() . '/src');
-        $loader->load('html_resources.yml', 'theme');
+            $locator = new FileLocator($this->appPaths->absolute('private_theme'));
+            $loader = $utility->createResourcesLoader($document, 'stylesheet', $locator, $this->appPaths->getThemePath() . '/src');
+            $loader->load('html_resources.yml', 'theme');
+            $loader = $utility->createResourcesLoader($document, 'javascript', $locator, $this->appPaths->getThemePath() . '/src');
+            $loader->load('html_resources.yml', 'theme');
 
-        if (!in_array('jsloader', $this->params['disabled'], true) ||
-            in_array($this->theme->getName(), $this->params['jsloader_themes'], true)
-        ) {
-            $document->setScriptsLocation(HtmlDocument::SCRIPTS_LOCATION_TOP);
-            // js initializer
-            $jsloader = $this->getJsLoader();
-            $script = $document->element('script');
-            $twig = $this->twig;
-            $env = $this->env;
-            $document->setScriptOutput(function (JavaScriptResourceManager $manager, array $translations)
-            use($jsloader, $script, $twig, $env)
-            {
-                $output = $jsloader->render('html');
+            if (!in_array('jsloader', $this->params['disabled'], true) ||
+                in_array($this->theme->getName(), $this->params['jsloader_themes'], true)
+            ) {
+                $document->setScriptsLocation(HtmlDocument::SCRIPTS_LOCATION_TOP);
+                // js initializer
+                $jsloader = $this->getJsLoader();
+                $script = $document->element('script');
+                $twig = $this->twig;
+                $env = $this->env;
+                $document->setScriptOutput(function (JavaScriptResourceManager $manager, array $translations)
+                use($jsloader, $script, $twig, $env)
+                {
+                    $output = $jsloader->render('html');
 
-                if ($env === 'dev') {
-                    foreach ($jsloader->resources() as $resource) {
-                        if ($resource instanceof CombineResourceInterface
-                            && $resource->getCombineObject()->getException() instanceof \Exception
-                        ) {
-                            throw $resource->getCombineObject()->getException();
+                    if ($env === 'dev') {
+                        foreach ($jsloader->resources() as $resource) {
+                            if ($resource instanceof CombineResourceInterface
+                                && $resource->getCombineObject()->getException() instanceof \Exception
+                            ) {
+                                throw $resource->getCombineObject()->getException();
+                            }
                         }
                     }
-                }
 
-                $output .= $twig->render('::head.html.twig', [
-                    "resources" => $manager->render('array'),
-                    "translations" => $translations,
-                ]);
+                    $output .= $twig->render('::head.html.twig', [
+                        "resources" => $manager->render('array'),
+                        "translations" => $translations,
+                    ]);
 
-                if (!$script->isEmpty()) {
-                    $output .= '<script type="text/javascript">' . $script->render() . '</script>';
-                    $script->update(function ()  {
-                        return '';
-                    });
-                }
+                    if (!$script->isEmpty()) {
+                        $output .= '<script type="text/javascript">' . $script->render() . '</script>';
+                        $script->update(function ()  {
+                            return '';
+                        });
+                    }
 
-                return $output;
-            });
-        } else {
-            $document->setScriptsLocation(HtmlDocument::SCRIPTS_LOCATION_NONE);
+                    return $output;
+                });
+            } else {
+                $document->setScriptsLocation(HtmlDocument::SCRIPTS_LOCATION_NONE);
+            }
         }
 
         // translations used in theme
