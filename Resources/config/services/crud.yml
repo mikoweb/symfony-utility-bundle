@@ -1,12 +1,10 @@
 services:
-    symfony_utility.crud_factory:
-        class: Mikoweb\SymfonyUtilityBundle\Crud\CrudFactory
+    Mikoweb\SymfonyUtilityBundle\Crud\CrudFactory:
         calls:
-            - [setContainer, ["@service_container"]]
+            - [setContainer, ['@service_container']]
 
-    symfony_utility.routing.crud_loader:
-        class: Mikoweb\SymfonyUtilityBundle\Routing\CrudLoader
+    Mikoweb\SymfonyUtilityBundle\Routing\CrudLoader:
         calls:
-            - [setContainer, ["@service_container"]]
+            - [setContainer, ['@service_container']]
         tags:
             - { name: routing.loader }

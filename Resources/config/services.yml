@@ -1,8 +1,7 @@
 imports:
-    - { resource: "services/crud.yml" }
-    - { resource: "services/twig.yml" }
+    - { resource: 'services/crud.yml' }
+    - { resource: 'services/twig.yml' }
 
 services:
-    symfony_utility.rest_form_service:
-        class: Mikoweb\SymfonyUtilityBundle\Service\RESTFormService
-        arguments: ["@twig"]
+    Mikoweb\SymfonyUtilityBundle\Service\RESTFormService:
+        arguments: ['@twig']

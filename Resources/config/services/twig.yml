@@ -1,7 +1,6 @@
 services:
-    symfony_utility.twig.utilities:
-        class: Mikoweb\SymfonyUtilityBundle\TwigExtension\UtilitiesExtension
+    Mikoweb\SymfonyUtilityBundle\TwigExtension\UtilitiesExtension:
         calls:
-            - [setContainer, ["@service_container"]]
+            - [setContainer, ['@service_container']]
         tags:
             - { name: twig.extension }

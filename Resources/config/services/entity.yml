@@ -1,21 +1,17 @@
 services:
-    symfony_utility.entity_factory:
-        class: Mikoweb\SymfonyUtilityBundle\Entity\EntityFactory
+    Mikoweb\SymfonyUtilityBundle\Entity\EntityFactory:
         arguments:
-            - "@symfony_utility.entity.provider.renderer"
-            - "@symfony_utility.entity.provider.url"
+            - '@Mikoweb\SymfonyUtilityBundle\Entity\Provider\RendererProvider'
+            - '@Mikoweb\SymfonyUtilityBundle\Entity\Provider\UrlProvider'
 
-    symfony_utility.entity.providers_subscriber:
-        class: Mikoweb\SymfonyUtilityBundle\EventListener\EntityProvidersSubscriber
+    Mikoweb\SymfonyUtilityBundle\EventListener\EntityProvidersSubscriber:
         calls:
-            - [setContainer, ["@service_container"]]
+            - [setContainer, ['@service_container']]
         tags:
             - { name: doctrine.event_subscriber, connection: default }
 
-    symfony_utility.entity.provider.url:
-        class: Mikoweb\SymfonyUtilityBundle\Entity\Provider\UrlProvider
-        arguments: ["@router"]
+    Mikoweb\SymfonyUtilityBundle\Entity\Provider\UrlProvider:
+        arguments: ['@router']
 
-    symfony_utility.entity.provider.renderer:
-        class: Mikoweb\SymfonyUtilityBundle\Entity\Provider\RendererProvider
-        arguments: ["@twig"]
+    Mikoweb\SymfonyUtilityBundle\Entity\Provider\RendererProvider:
+        arguments: ['@twig']
