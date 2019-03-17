@@ -1,16 +1,13 @@
 <?php
 
 /*
- * This file is part of the vSymfo package.
- *
- * website: www.vision-web.pl
- * (c) Rafał Mikołajun <rafal@vision-web.pl>
+ * (c) Rafał Mikołajun <root@rmweb.pl>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace vSymfo\Bundle\CoreBundle\Crud;
+namespace Mikoweb\SymfonyUtilityBundle\Crud;
 
 use JMS\I18nRoutingBundle\Router\I18nRouter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -18,24 +15,15 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\RouterInterface;
-use vSymfo\Core\Crud\CrudableInterface;
-use vSymfo\Core\Crud\CrudInterface;
-use vSymfo\Core\Crud\DataEvent;
-use vSymfo\Core\Crud\DataInterface;
-use vSymfo\Core\Manager\ControllerManagerInterface;
+use Mikoweb\SymfonyUtility\Crud\CrudableInterface;
+use Mikoweb\SymfonyUtility\Crud\CrudInterface;
+use Mikoweb\SymfonyUtility\Crud\DataEvent;
+use Mikoweb\SymfonyUtility\Crud\DataInterface;
+use Mikoweb\SymfonyUtility\Manager\ControllerManagerInterface;
 
-/**
- * Common CRUD that contains Crudable object.
- *
- * @author Rafał Mikołajun <rafal@vision-web.pl>
- * @package vSymfo Core Bundle
- * @subpackage Crud
- */
 abstract class CrudAbstract implements CrudInterface
 {
     const FLASH_SUCCESS = 'success';
@@ -99,7 +87,7 @@ abstract class CrudAbstract implements CrudInterface
     /**
      * {@inheritdoc}
      */
-    public function getRelated()
+    public function getRelated(): CrudableInterface
     {
         return $this->related;
     }
@@ -107,24 +95,18 @@ abstract class CrudAbstract implements CrudInterface
     /**
      * {@inheritdoc}
      */
-    public function setRelated(CrudableInterface $related)
+    public function setRelated(CrudableInterface $related): void
     {
         $this->related = $related;
         $this->options = $this->optionsResolver->resolve($related->getCrudOptions());
     }
 
-    /**
-     * @return array
-     */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
 
-    /**
-     * @return ControllerManagerInterface
-     */
-    public function getManager()
+    public function getManager(): ControllerManagerInterface
     {
         return $this->options['manager'];
     }
@@ -136,7 +118,7 @@ abstract class CrudAbstract implements CrudInterface
      *
      * @return string
      */
-    public function flashType($type)
+    public function flashType(string $type): string
     {
         return empty($this->options['flash_prefix']) ? $type : ($this->options['flash_prefix'] . '_' . $type);
     }
@@ -148,7 +130,7 @@ abstract class CrudAbstract implements CrudInterface
      *
      * @return string
      */
-    public function message($id)
+    public function message(string $id): string
     {
         $name = empty($this->options['message_prefix']) ? $id : ($this->options['message_prefix'] . '.' . $id);
 
@@ -162,7 +144,7 @@ abstract class CrudAbstract implements CrudInterface
      * @param string $type      $type e.g. success
      * @param string $messageId The message id.
      */
-    public function addFlash($type, $messageId)
+    public function addFlash(string $type, string $messageId): void
     {
         $this->container->get('session')->getFlashBag()->add($this->flashType($type), $this->message($messageId));
     }
@@ -170,7 +152,7 @@ abstract class CrudAbstract implements CrudInterface
     /**
      * {@inheritdoc}
      */
-    public function indexRoute()
+    public function indexRoute(): string
     {
         return $this->options['route_prefix'] . '_index';
     }
@@ -178,7 +160,7 @@ abstract class CrudAbstract implements CrudInterface
     /**
      * {@inheritdoc}
      */
-    public function createRoute()
+    public function createRoute(): string
     {
         return $this->options['route_prefix'] . '_create';
     }
@@ -186,7 +168,7 @@ abstract class CrudAbstract implements CrudInterface
     /**
      * {@inheritdoc}
      */
-    public function storeRoute()
+    public function storeRoute(): string
     {
         return $this->options['route_prefix'] . '_store';
     }
@@ -194,7 +176,7 @@ abstract class CrudAbstract implements CrudInterface
     /**
      * {@inheritdoc}
      */
-    public function showRoute()
+    public function showRoute(): string
     {
         return $this->options['route_prefix'] . '_show';
     }
@@ -202,7 +184,7 @@ abstract class CrudAbstract implements CrudInterface
     /**
      * {@inheritdoc}
      */
-    public function editRoute()
+    public function editRoute(): string
     {
         return $this->options['route_prefix'] . '_edit';
     }
@@ -210,7 +192,7 @@ abstract class CrudAbstract implements CrudInterface
     /**
      * {@inheritdoc}
      */
-    public function updateRoute()
+    public function updateRoute(): string
     {
         return $this->options['route_prefix'] . '_update';
     }
@@ -218,19 +200,12 @@ abstract class CrudAbstract implements CrudInterface
     /**
      * {@inheritdoc}
      */
-    public function destroyRoute()
+    public function destroyRoute(): string
     {
         return $this->options['route_prefix'] . '_destroy';
     }
 
-    /**
-     * @param EventDispatcher $dispatcher
-     * @param string $name
-     * @param DataInterface $data
-     *
-     * @return DataEvent
-     */
-    protected function dispatch(EventDispatcher $dispatcher, $name, DataInterface $data)
+    protected function dispatch(EventDispatcher $dispatcher, string $name, DataInterface $data): DataEvent
     {
         $event = new DataEvent($data);
         $dispatcher->dispatch($name, $event);
@@ -249,7 +224,11 @@ abstract class CrudAbstract implements CrudInterface
      *
      * @see UrlGeneratorInterface
      */
-    protected function generateUrl($route, $parameters = [], $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
+    protected function generateUrl(
+        string $route,
+        $parameters = [],
+        int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
+    ): string
     {
         return $this->container->get('router')->generate($route, $parameters, $referenceType);
     }
@@ -262,7 +241,7 @@ abstract class CrudAbstract implements CrudInterface
      *
      * @return RedirectResponse
      */
-    protected function redirect($url, $status = 302)
+    protected function redirect(string $url, int $status = 302): RedirectResponse
     {
         return new RedirectResponse($url, $status);
     }
@@ -276,7 +255,7 @@ abstract class CrudAbstract implements CrudInterface
      *
      * @return RedirectResponse
      */
-    protected function redirectToRoute($route, array $parameters = [], $status = 302)
+    protected function redirectToRoute(string $route, array $parameters = [], int $status = 302): RedirectResponse
     {
         return $this->redirect($this->generateUrl($route, $parameters), $status);
     }
@@ -289,7 +268,7 @@ abstract class CrudAbstract implements CrudInterface
      *
      * @return array
      */
-    protected function routeParams($entity, \Closure $closure = null)
+    protected function routeParams($entity, \Closure $closure = null): array
     {
         if (is_null($closure)) {
             $params = $this->options['route_params']($entity);
@@ -311,7 +290,7 @@ abstract class CrudAbstract implements CrudInterface
      *
      * @throws RouteNotFoundException
      */
-    protected function formRedirect(Request $request, $routeName, $parameters = [])
+    protected function formRedirect(Request $request, string $routeName, array $parameters = []): Response
     {
         $router = $this->container->get('router');
         if ($router instanceof I18nRouter) {

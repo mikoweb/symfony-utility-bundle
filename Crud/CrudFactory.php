@@ -1,28 +1,20 @@
 <?php
 
 /*
- * This file is part of the vSymfo package.
- *
- * website: www.vision-web.pl
- * (c) Rafał Mikołajun <rafal@vision-web.pl>
+ * (c) Rafał Mikołajun <root@rmweb.pl>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace vSymfo\Bundle\CoreBundle\Crud;
+namespace Mikoweb\SymfonyUtilityBundle\Crud;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use vSymfo\Core\Crud\CrudableInterface;
-use vSymfo\Core\Crud\CrudFactoryInterface;
-use vSymfo\Core\Crud\CrudInterface;
+use Mikoweb\SymfonyUtility\Crud\CrudableInterface;
+use Mikoweb\SymfonyUtility\Crud\CrudFactoryInterface;
+use Mikoweb\SymfonyUtility\Crud\CrudInterface;
 
-/**
- * @author Rafał Mikołajun <rafal@vision-web.pl>
- * @package vSymfo Core Bundle
- * @subpackage Crud
- */
 class CrudFactory implements ContainerAwareInterface, CrudFactoryInterface
 {
     /**
@@ -40,8 +32,10 @@ class CrudFactory implements ContainerAwareInterface, CrudFactoryInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \ReflectionException
      */
-    public function create(CrudableInterface $object)
+    public function create(CrudableInterface $object): CrudInterface
     {
         $class = $object->getCrudClass();
 

@@ -1,11 +1,11 @@
 services:
-    vsymfo_core.crud_factory:
-        class: vSymfo\Bundle\CoreBundle\Crud\CrudFactory
+    symfony_utility.crud_factory:
+        class: Mikoweb\SymfonyUtilityBundle\Crud\CrudFactory
         calls:
             - [setContainer, ["@service_container"]]
 
-    vsymfo_core.routing.crud_loader:
-        class: vSymfo\Bundle\CoreBundle\Routing\CrudLoader
+    symfony_utility.routing.crud_loader:
+        class: Mikoweb\SymfonyUtilityBundle\Routing\CrudLoader
         calls:
             - [setContainer, ["@service_container"]]
         tags:

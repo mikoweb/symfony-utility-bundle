@@ -1,22 +1,14 @@
 <?php
 
 /*
- * This file is part of the vSymfo package.
- *
- * website: www.vision-web.pl
- * (c) Rafał Mikołajun <rafal@vision-web.pl>
+ * (c) Rafał Mikołajun <root@rmweb.pl>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace vSymfo\Bundle\CoreBundle\Entity\Provider\Exception;
+namespace Mikoweb\SymfonyUtilityBundle\Entity\Provider\Exception;
 
-/**
- * @author Rafał Mikołajun <rafal@vision-web.pl>
- * @package vSymfo Core Bundle
- * @subpackage Entity_Provider
- */
 class EntityViewNotFoundException extends \Exception
 {
     /**
@@ -29,41 +21,29 @@ class EntityViewNotFoundException extends \Exception
      */
     private $className;
 
-    /**
-     * @return string
-     */
-    public function getKey()
+    public function getKey(): string
     {
         return $this->key;
     }
 
-    /**
-     * @param string $key
-     */
-    public function setKey($key)
+    public function setKey(string $key): void
     {
         $this->key = $key;
         $this->message();
     }
 
-    /**
-     * @return string
-     */
-    public function getClassName()
+    public function getClassName(): string
     {
         return $this->className;
     }
 
-    /**
-     * @param string $className
-     */
-    public function setClassName($className)
+    public function setClassName(string $className): void
     {
         $this->className = $className;
         $this->message();
     }
 
-    private function message()
+    private function message(): void
     {
         $this->message = 'Not found view "' . $this->key . '" for class "' . $this->className . '"';
     }

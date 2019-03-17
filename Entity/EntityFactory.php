@@ -1,31 +1,21 @@
 <?php
 
 /*
- * This file is part of the vSymfo package.
- *
- * website: www.vision-web.pl
- * (c) Rafał Mikołajun <rafal@vision-web.pl>
+ * (c) Rafał Mikołajun <root@rmweb.pl>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace vSymfo\Bundle\CoreBundle\Entity;
+namespace Mikoweb\SymfonyUtilityBundle\Entity;
 
-use vSymfo\Bundle\CoreBundle\Entity\Provider\ImagesProvider;
-use vSymfo\Bundle\CoreBundle\Entity\Provider\RendererProvider;
-use vSymfo\Bundle\CoreBundle\Entity\Provider\UrlProvider;
-use vSymfo\Core\Entity\EntityFactoryAbstract;
-use vSymfo\Core\Entity\EntityFactoryInterface;
-use vSymfo\Core\Entity\Interfaces\ImagesProviderAwareInterface;
-use vSymfo\Core\Entity\Interfaces\RendererProviderAwareInterface;
-use vSymfo\Core\Entity\Interfaces\UrlProviderAwareInterface;
+use Mikoweb\SymfonyUtilityBundle\Entity\Provider\RendererProvider;
+use Mikoweb\SymfonyUtilityBundle\Entity\Provider\UrlProvider;
+use Mikoweb\SymfonyUtility\Entity\EntityFactoryAbstract;
+use Mikoweb\SymfonyUtility\Entity\EntityFactoryInterface;
+use Mikoweb\SymfonyUtility\Entity\Interfaces\RendererProviderAwareInterface;
+use Mikoweb\SymfonyUtility\Entity\Interfaces\UrlProviderAwareInterface;
 
-/**
- * @author Rafał Mikołajun <rafal@vision-web.pl>
- * @package vSymfo Core Bundle
- * @subpackage Entity
- */
 class EntityFactory extends EntityFactoryAbstract
 {
     /**
@@ -39,11 +29,6 @@ class EntityFactory extends EntityFactoryAbstract
     private $relatedFactories;
 
     /**
-     * @var ImagesProvider
-     */
-    private $imagesProvider;
-
-    /**
      * @var RendererProvider
      */
     private $rendererProvider;
@@ -54,18 +39,15 @@ class EntityFactory extends EntityFactoryAbstract
     private $urlProvider;
 
     /**
-     * @param ImagesProvider $imagesProvider
      * @param RendererProvider $rendererProvider
      * @param $urlProvider
      */
-    public function __construct(ImagesProvider $imagesProvider, RendererProvider $rendererProvider, $urlProvider)
+    public function __construct(RendererProvider $rendererProvider, UrlProvider $urlProvider)
     {
-        $this->imagesProvider = $imagesProvider;
         $this->rendererProvider = $rendererProvider;
         $this->urlProvider = $urlProvider;
 
         $this->awareInterfaces = [
-            ImagesProviderAwareInterface::class => 'imagesProviderAware',
             RendererProviderAwareInterface::class => 'rendererProviderAware',
             UrlProviderAwareInterface::class => 'urlProviderAware',
         ];
@@ -75,6 +57,8 @@ class EntityFactory extends EntityFactoryAbstract
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \ReflectionException
      */
     public function aware($entity)
     {
@@ -93,10 +77,7 @@ class EntityFactory extends EntityFactoryAbstract
         }
     }
 
-    /**
-     * @param EntityFactoryInterface $factory
-     */
-    public function addFactory(EntityFactoryInterface $factory)
+    public function addFactory(EntityFactoryInterface $factory): void
     {
         if ($factory === $this) {
             throw new \UnexpectedValueException('You can not add yourself!');
@@ -107,26 +88,12 @@ class EntityFactory extends EntityFactoryAbstract
         }
     }
 
-    /**
-     * @param ImagesProviderAwareInterface $entity
-     */
-    private function imagesProviderAware(ImagesProviderAwareInterface $entity)
-    {
-        $entity->setImagesProvider($this->imagesProvider);
-    }
-
-    /**
-     * @param RendererProviderAwareInterface $entity
-     */
-    private function rendererProviderAware(RendererProviderAwareInterface $entity)
+    protected function rendererProviderAware(RendererProviderAwareInterface $entity): void
     {
         $entity->setRendererProvider($this->rendererProvider);
     }
 
-    /**
-     * @param UrlProviderAwareInterface $entity
-     */
-    private function urlProviderAware(UrlProviderAwareInterface $entity)
+    protected function urlProviderAware(UrlProviderAwareInterface $entity): void
     {
         $entity->setUrlProvider($this->urlProvider);
     }

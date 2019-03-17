@@ -1,35 +1,27 @@
 <?php
 
 /*
- * This file is part of the vSymfo package.
- *
- * website: www.vision-web.pl
- * (c) Rafał Mikołajun <rafal@vision-web.pl>
+ * (c) Rafał Mikołajun <root@rmweb.pl>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace vSymfo\Bundle\CoreBundle\Crud;
+namespace Mikoweb\SymfonyUtilityBundle\Crud;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use vSymfo\Core\Crud\Data;
-use vSymfo\Core\Crud\DataEvent;
-use vSymfo\Core\Crud\DataInterface;
+use Mikoweb\SymfonyUtility\Crud\Data;
+use Mikoweb\SymfonyUtility\Crud\DataEvent;
+use Mikoweb\SymfonyUtility\Crud\DataInterface;
 
-/**
- * @author Rafał Mikołajun <rafal@vision-web.pl>
- * @package vSymfo Core Bundle
- * @subpackage Crud
- */
 class Crud extends CrudAbstract
 {
     /**
      * {@inheritdoc}
      */
-    public function index(Request $request, array $options = [])
+    public function index(Request $request, array $options = []): DataInterface
     {
         $options = $this->commonOptionsResolver()->resolve($options);
         $data = new Data();
@@ -42,7 +34,7 @@ class Crud extends CrudAbstract
     /**
      * {@inheritdoc}
      */
-    public function create(Request $request, array $options = [])
+    public function create(Request $request, array $options = []): DataInterface
     {
         $options = $this->commonOptionsResolver()->resolve($options);
         $data = new Data();
@@ -67,7 +59,7 @@ class Crud extends CrudAbstract
     /**
      * {@inheritdoc}
      */
-    public function store(Request $request, array $options = [])
+    public function store(Request $request, array $options = []): DataInterface
     {
         $options = $this->commonOptionsResolver()->resolve($options);
         $data = new Data();
@@ -102,7 +94,7 @@ class Crud extends CrudAbstract
     /**
      * {@inheritdoc}
      */
-    public function show(Request $request, array $options = [])
+    public function show(Request $request, array $options = []): DataInterface
     {
         $options = $this->commonOptionsResolver()->resolve($options);
         $data = new Data();
@@ -114,7 +106,7 @@ class Crud extends CrudAbstract
     /**
      * {@inheritdoc}
      */
-    public function edit(Request $request, array $options = [])
+    public function edit(Request $request, array $options = []): DataInterface
     {
         $options = $this->commonOptionsResolver()->resolve($options);
         $data = new Data();
@@ -136,7 +128,7 @@ class Crud extends CrudAbstract
     /**
      * {@inheritdoc}
      */
-    public function update(Request $request, array $options = [])
+    public function update(Request $request, array $options = []): DataInterface
     {
         $options = $this->commonOptionsResolver()->resolve($options);
         $data = new Data();
@@ -171,7 +163,7 @@ class Crud extends CrudAbstract
     /**
      * {@inheritdoc}
      */
-    public function destroy(Request $request, array $options = [])
+    public function destroy(Request $request, array $options = []): DataInterface
     {
         $options = $this->commonOptionsResolver()->resolve($options);
         $data = new Data();
@@ -192,10 +184,7 @@ class Crud extends CrudAbstract
         return $data;
     }
 
-    /**
-     * @return OptionsResolver
-     */
-    protected function commonOptionsResolver()
+    protected function commonOptionsResolver(): OptionsResolver
     {
         $resolver = new OptionsResolver();
         $resolver->setDefaults([
@@ -219,11 +208,7 @@ class Crud extends CrudAbstract
         return $resolver;
     }
 
-    /**
-     * @param EventDispatcher $dispatcher
-     * @param array $events
-     */
-    protected function addListeners(EventDispatcher $dispatcher, array $events)
+    protected function addListeners(EventDispatcher $dispatcher, array $events): void
     {
         foreach ($events as $name => $closure) {
             if (is_callable($closure)) {
@@ -240,7 +225,7 @@ class Crud extends CrudAbstract
      *
      * @return array
      */
-    protected function routeParameters(DataInterface $data, array $options)
+    protected function routeParameters(DataInterface $data, array $options): array
     {
         if (is_null($data->getEntity())) {
             throw new \UnexpectedValueException('Entity is null');
@@ -249,11 +234,7 @@ class Crud extends CrudAbstract
         return $this->routeParams($data->getEntity(), $options['route_params']);
     }
 
-    /**
-     * @param DataInterface $data
-     * @param array $options
-     */
-    protected function redirectAfterSave(DataInterface $data, array $options)
+    protected function redirectAfterSave(DataInterface $data, array $options): void
     {
         if (empty($options['redirect_url'])) {
             $data->setResponse($this->redirectToRoute($this->editRoute(), $this->routeParameters($data, $options)));

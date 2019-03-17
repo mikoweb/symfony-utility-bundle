@@ -1,16 +1,13 @@
 <?php
 
 /*
- * This file is part of the vSymfo package.
- *
- * website: www.vision-web.pl
- * (c) Rafał Mikołajun <rafal@vision-web.pl>
+ * (c) Rafał Mikołajun <root@rmweb.pl>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace vSymfo\Bundle\CoreBundle\Routing;
+namespace Mikoweb\SymfonyUtilityBundle\Routing;
 
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -19,11 +16,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-/**
- * @author Rafał Mikołajun <rafal@vision-web.pl>
- * @package vSymfo Core Bundle
- * @subpackage Routing
- */
 class CrudLoader extends Loader implements ContainerAwareInterface
 {
     /**
@@ -122,7 +114,7 @@ class CrudLoader extends Loader implements ContainerAwareInterface
      * @param RouteCollection $collection Routes collection
      * @param mixed $resource The resource
      */
-    protected function includeResource(RouteCollection $collection, $resource)
+    protected function includeResource(RouteCollection $collection, $resource): void
     {
         switch (pathinfo($resource, PATHINFO_EXTENSION)) {
             case 'yml':
@@ -134,10 +126,7 @@ class CrudLoader extends Loader implements ContainerAwareInterface
         }
     }
 
-    /**
-     * @return OptionsResolver
-     */
-    protected function getOptionsResolver()
+    protected function getOptionsResolver(): OptionsResolver
     {
         if (is_null($this->optionsResolver)) {
             $resolver = new OptionsResolver();
@@ -166,7 +155,7 @@ class CrudLoader extends Loader implements ContainerAwareInterface
      *
      * @return Route[]
      */
-    protected function indexRoute(array $options)
+    protected function indexRoute(array $options): array
     {
         $routes = [];
 
@@ -215,7 +204,7 @@ class CrudLoader extends Loader implements ContainerAwareInterface
      *
      * @return array
      */
-    protected function indexSortParams(array $options)
+    protected function indexSortParams(array $options): array
     {
         $params = [
             'sort' => null,
@@ -237,7 +226,7 @@ class CrudLoader extends Loader implements ContainerAwareInterface
      * @param Route $route
      * @param $params
      */
-    protected function addSortDefaults(Route $route, array $params)
+    protected function addSortDefaults(Route $route, array $params): void
     {
         if ($params['sort']) {
             $route->setDefault('sort', $params['sort']);
@@ -253,7 +242,7 @@ class CrudLoader extends Loader implements ContainerAwareInterface
      *
      * @return Route
      */
-    protected function createRoute(array $options)
+    protected function createRoute(array $options): Route
     {
         $route = new Route('/create');
         $route->setMethods(['GET']);
@@ -267,7 +256,7 @@ class CrudLoader extends Loader implements ContainerAwareInterface
      *
      * @return Route
      */
-    protected function storeRoute(array $options)
+    protected function storeRoute(array $options): Route
     {
         $route = new Route('/');
         $route->setMethods(['POST']);
@@ -281,7 +270,7 @@ class CrudLoader extends Loader implements ContainerAwareInterface
      *
      * @return Route
      */
-    protected function showRoute(array $options)
+    protected function showRoute(array $options): Route
     {
         $route = new Route('/{id}');
         $route->setMethods(['GET']);
@@ -296,7 +285,7 @@ class CrudLoader extends Loader implements ContainerAwareInterface
      *
      * @return Route
      */
-    protected function editRoute(array $options)
+    protected function editRoute(array $options): Route
     {
         $route = new Route('/{id}/edit');
         $route->setMethods(['GET']);
@@ -311,7 +300,7 @@ class CrudLoader extends Loader implements ContainerAwareInterface
      *
      * @return Route
      */
-    protected function updateRoute(array $options)
+    protected function updateRoute(array $options): Route
     {
         $route = new Route('/{id}/update');
         $route->setMethods(['POST']);
@@ -326,7 +315,7 @@ class CrudLoader extends Loader implements ContainerAwareInterface
      *
      * @return Route
      */
-    protected function destroyRoute(array $options)
+    protected function destroyRoute(array $options): Route
     {
         $route = new Route('/{id}/destroy');
         $route->setMethods(['GET', 'POST']);
@@ -341,7 +330,7 @@ class CrudLoader extends Loader implements ContainerAwareInterface
      *
      * @return string
      */
-    protected function routePrefix($prefix)
+    protected function routePrefix(string $prefix): string
     {
         if (strpos($prefix, '%') === 0 && strrpos($prefix, '%') === strlen($prefix) - 1) {
             $prefix = $this->container->getParameter(substr($prefix, 1, -1));

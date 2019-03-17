@@ -1,26 +1,18 @@
 <?php
 
 /*
- * This file is part of the vSymfo package.
- *
- * website: www.vision-web.pl
- * (c) Rafał Mikołajun <rafal@vision-web.pl>
+ * (c) Rafał Mikołajun <root@rmweb.pl>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace vSymfo\Bundle\CoreBundle\Entity\Provider;
+namespace Mikoweb\SymfonyUtilityBundle\Entity\Provider;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
-use vSymfo\Core\Entity\Provider\UrlProviderInterface;
+use Mikoweb\SymfonyUtility\Entity\Provider\UrlProviderInterface;
 
-/**
- * @author Rafał Mikołajun <rafal@vision-web.pl>
- * @package vSymfo Core Bundle
- * @subpackage Entity_Provider
- */
 class UrlProvider implements UrlProviderInterface
 {
     /**
@@ -39,7 +31,7 @@ class UrlProvider implements UrlProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function generate($name, $parameters = [], $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
+    public function generate(string $name, $parameters = [], $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
     {
         return $this->router->generate($name, $parameters, $referenceType);
     }

@@ -1,28 +1,20 @@
 <?php
 
 /*
- * This file is part of the vSymfo package.
- *
- * website: www.vision-web.pl
- * (c) Rafał Mikołajun <rafal@vision-web.pl>
+ * (c) Rafał Mikołajun <root@rmweb.pl>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace vSymfo\Bundle\CoreBundle\EventListener;
+namespace Mikoweb\SymfonyUtilityBundle\EventListener;
 
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use vSymfo\Bundle\CoreBundle\Entity\EntityFactory;
+use Mikoweb\SymfonyUtilityBundle\Entity\EntityFactory;
 
-/**
- * @author Rafał Mikołajun <rafal@vision-web.pl>
- * @package vSymfo Core Bundle
- * @subpackage EventListener
- */
 class EntityProvidersSubscriber implements EventSubscriber, ContainerAwareInterface
 {
     /**
@@ -43,6 +35,7 @@ class EntityProvidersSubscriber implements EventSubscriber, ContainerAwareInterf
 
     /**
      * @param LifecycleEventArgs $args
+     * @throws \ReflectionException
      */
     public function postLoad(LifecycleEventArgs $args)
     {
@@ -51,6 +44,7 @@ class EntityProvidersSubscriber implements EventSubscriber, ContainerAwareInterf
 
     /**
      * @param LifecycleEventArgs $args
+     * @throws \ReflectionException
      */
     public function postPersist(LifecycleEventArgs $args)
     {
@@ -65,11 +59,8 @@ class EntityProvidersSubscriber implements EventSubscriber, ContainerAwareInterf
         $this->container = $container;
     }
 
-    /**
-     * @return EntityFactory
-     */
-    public function getEntityFactory()
+    public function getEntityFactory(): EntityFactory
     {
-        return $this->container->get('vsymfo_core.entity_factory');
+        return $this->container->get('symfony_utility.entity_factory');
     }
 }

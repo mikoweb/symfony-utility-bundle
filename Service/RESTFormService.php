@@ -1,26 +1,18 @@
 <?php
 
 /*
- * This file is part of the vSymfo package.
- *
- * website: www.vision-web.pl
- * (c) Rafał Mikołajun <rafal@vision-web.pl>
+ * (c) Rafał Mikołajun <root@rmweb.pl>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace vSymfo\Bundle\CoreBundle\Service;
+namespace Mikoweb\SymfonyUtilityBundle\Service;
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * @author Rafał Mikołajun <rafal@vision-web.pl>
- * @package vSymfo Core Bundle
- * @subpackage Service
- */
 class RESTFormService
 {
     /**
@@ -64,7 +56,7 @@ class RESTFormService
      *
      * @return array
      */
-    public function data(Form $form, $template = null, $addValid = true, $addErrors = true)
+    public function data(Form $form, ?string $template = null, bool $addValid = true, bool $addErrors = true): array
     {
         $data = [];
         $view = $form->createView();
@@ -103,7 +95,7 @@ class RESTFormService
      *
      * @return array
      */
-    public function errors(Form $form)
+    public function errors(Form $form): array
     {
         $errors = [];
         $view = $form->createView();
@@ -122,7 +114,7 @@ class RESTFormService
      *
      * @return array
      */
-    public function firstItem(Request $request, Form $form, $field, $data)
+    public function firstItem(Request $request, Form $form, string $field, $data): array
     {
         $item = [];
         $content = json_decode($request->getContent());
@@ -142,7 +134,7 @@ class RESTFormService
     /**
      * @return string
      */
-    public function getValidAttr()
+    public function getValidAttr(): string
     {
         return $this->validAttr;
     }
@@ -150,7 +142,7 @@ class RESTFormService
     /**
      * @param string $validAttr
      */
-    public function setValidAttr($validAttr)
+    public function setValidAttr(string $validAttr): void
     {
         $this->validAttr = $validAttr;
     }
@@ -158,7 +150,7 @@ class RESTFormService
     /**
      * @return string
      */
-    public function getHtmlAttr()
+    public function getHtmlAttr(): string
     {
         return $this->htmlAttr;
     }
@@ -166,7 +158,7 @@ class RESTFormService
     /**
      * @param string $htmlAttr
      */
-    public function setHtmlAttr($htmlAttr)
+    public function setHtmlAttr(string $htmlAttr): void
     {
         $this->htmlAttr = $htmlAttr;
     }
@@ -174,7 +166,7 @@ class RESTFormService
     /**
      * @return string
      */
-    public function getMessageAttr()
+    public function getMessageAttr(): string
     {
         return $this->messageAttr;
     }
@@ -182,7 +174,7 @@ class RESTFormService
     /**
      * @param string $messageAttr
      */
-    public function setMessageAttr($messageAttr)
+    public function setMessageAttr(string $messageAttr): void
     {
         $this->messageAttr = $messageAttr;
     }
@@ -192,7 +184,7 @@ class RESTFormService
      * @param FormView $view
      * @param null|array $parent
      */
-    private function childrenData(array &$data, FormView $view, array &$parent = null)
+    private function childrenData(array &$data, FormView $view, array &$parent = null): void
     {
         if (empty($view->children)) {
             $item = &$parent[$view->vars['name']];
@@ -212,9 +204,9 @@ class RESTFormService
     /**
      * @param array $errors
      * @param FormView $view
-     * @param string
+     * @param string $path
      */
-    private function childrenErrors(array &$errors, FormView $view, $path)
+    private function childrenErrors(array &$errors, FormView $view, string $path): void
     {
         if (isset($view->vars['errors'])) {
             foreach ($view->vars['errors'] as $error) {

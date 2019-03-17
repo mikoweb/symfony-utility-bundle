@@ -1,4 +1,0 @@
-vsymfo_core_webui_css:
-    path:            /resources/webui_css/{name}/{theme}
-    defaults:
-        _controller: vSymfoBundleCoreBundle:Resources:webuiCss
