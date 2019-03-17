@@ -15,6 +15,11 @@ use Mikoweb\SymfonyUtilityBundle\Crud\CrudFactory;
 trait CrudableTrait
 {
     /**
+     * @var CrudFactory
+     */
+    private $crudFactory;
+
+    /**
      * {@inheritdoc}
      */
     public function getCrudClass(): string
@@ -23,12 +28,12 @@ trait CrudableTrait
     }
 
     /**
-     * Returns CRUD factory. 
+     * Returns CRUD factory.
      *
      * @return CrudFactory
      */
     protected function crudFactory(): CrudFactory
     {
-        return $this->get('vsymfo_core.crud_factory');
+        return $this->crudFactory;
     }
 }
