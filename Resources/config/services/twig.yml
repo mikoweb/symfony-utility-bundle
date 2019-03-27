@@ -1,6 +1,6 @@
 services:
     Mikoweb\SymfonyUtilityBundle\TwigExtension\UtilitiesExtension:
         arguments:
-            - "@Symfony\Contracts\Translation\TranslatorInterface"
+            - '@Symfony\Contracts\Translation\TranslatorInterface'
         tags:
             - { name: twig.extension }
