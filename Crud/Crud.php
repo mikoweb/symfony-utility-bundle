@@ -25,8 +25,7 @@ class Crud extends CrudAbstract
     {
         $options = $this->commonOptionsResolver()->resolve($options);
         $data = new Data();
-        $data->setCollection($this->getManager()->getPagination($request,
-            $this->container->getParameter('vsymfo_core.pagination.limit')));
+        $data->setCollection($this->getManager()->getPagination($request, getenv('PAGINATION_LIMIT') ?? 20));
 
         return $data;
     }
