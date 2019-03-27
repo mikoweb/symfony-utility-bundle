@@ -1,6 +1,6 @@
 services:
     Mikoweb\SymfonyUtilityBundle\TwigExtension\UtilitiesExtension:
-        calls:
-            - [setContainer, ['@service_container']]
+        arguments:
+            - "@Symfony\Contracts\Translation\TranslatorInterface"
         tags:
             - { name: twig.extension }

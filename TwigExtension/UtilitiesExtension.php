@@ -9,23 +9,18 @@
 
 namespace Mikoweb\SymfonyUtilityBundle\TwigExtension;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use vSymfo\Component\Document\UrlManager;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class UtilitiesExtension extends \Twig_Extension implements ContainerAwareInterface
+class UtilitiesExtension extends \Twig_Extension
 {
     /**
-     * @var ContainerInterface
+     * @var TranslatorInterface
      */
-    protected $container;
+    protected $translator;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
+    public function __construct(TranslatorInterface $translator)
     {
-        $this->container = $container;
+        $this->translator = $translator;
     }
 
     /**
@@ -143,8 +138,6 @@ class UtilitiesExtension extends \Twig_Extension implements ContainerAwareInterf
      */
     public function transDate(string $text): string
     {
-        $trans = $this->container->get('translator');
-
         $text = str_replace([
             "January",
             "February",
@@ -159,59 +152,59 @@ class UtilitiesExtension extends \Twig_Extension implements ContainerAwareInterf
             "November",
             "December"
         ], [
-            $trans->trans("date.month.january", [], "date"),
-            $trans->trans("date.month.february", [], "date"),
-            $trans->trans("date.month.march", [], "date"),
-            $trans->trans("date.month.april", [], "date"),
-            $trans->trans("date.month.may", [], "date"),
-            $trans->trans("date.month.june", [], "date"),
-            $trans->trans("date.month.july", [], "date"),
-            $trans->trans("date.month.august", [], "date"),
-            $trans->trans("date.month.september", [], "date"),
-            $trans->trans("date.month.october", [], "date"),
-            $trans->trans("date.month.november", [], "date"),
-            $trans->trans("date.month.december", [], "date"),
+            $this->translator->trans("date.month.january", [], "date"),
+            $this->translator->trans("date.month.february", [], "date"),
+            $this->translator->trans("date.month.march", [], "date"),
+            $this->translator->trans("date.month.april", [], "date"),
+            $this->translator->trans("date.month.may", [], "date"),
+            $this->translator->trans("date.month.june", [], "date"),
+            $this->translator->trans("date.month.july", [], "date"),
+            $this->translator->trans("date.month.august", [], "date"),
+            $this->translator->trans("date.month.september", [], "date"),
+            $this->translator->trans("date.month.october", [], "date"),
+            $this->translator->trans("date.month.november", [], "date"),
+            $this->translator->trans("date.month.december", [], "date"),
         ], $text);
 
         $text = ucfirst(str_replace([
             "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
         ], [
-            $trans->trans("date.month.jan", [], "date"),
-            $trans->trans("date.month.feb", [], "date"),
-            $trans->trans("date.month.mar", [], "date"),
-            $trans->trans("date.month.apr", [], "date"),
-            $trans->trans("date.month.may", [], "date"),
-            $trans->trans("date.month.jun", [], "date"),
-            $trans->trans("date.month.jul", [], "date"),
-            $trans->trans("date.month.aug", [], "date"),
-            $trans->trans("date.month.sep", [], "date"),
-            $trans->trans("date.month.oct", [], "date"),
-            $trans->trans("date.month.nov", [], "date"),
-            $trans->trans("date.month.dec", [], "date"),
+            $this->translator->trans("date.month.jan", [], "date"),
+            $this->translator->trans("date.month.feb", [], "date"),
+            $this->translator->trans("date.month.mar", [], "date"),
+            $this->translator->trans("date.month.apr", [], "date"),
+            $this->translator->trans("date.month.may", [], "date"),
+            $this->translator->trans("date.month.jun", [], "date"),
+            $this->translator->trans("date.month.jul", [], "date"),
+            $this->translator->trans("date.month.aug", [], "date"),
+            $this->translator->trans("date.month.sep", [], "date"),
+            $this->translator->trans("date.month.oct", [], "date"),
+            $this->translator->trans("date.month.nov", [], "date"),
+            $this->translator->trans("date.month.dec", [], "date"),
         ], $text));
 
         $text = str_replace([
             "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
         ], [
-            $trans->trans("date.day.sunday", [], "date"),
-            $trans->trans("date.day.monday", [], "date"),
-            $trans->trans("date.day.tuesday", [], "date"),
-            $trans->trans("date.day.wednesday", [], "date"),
-            $trans->trans("date.day.thursday", [], "date"),
-            $trans->trans("date.day.friday", [], "date"),
-            $trans->trans("date.day.saturday", [], "date"),
+            $this->translator->trans("date.day.sunday", [], "date"),
+            $this->translator->trans("date.day.monday", [], "date"),
+            $this->translator->trans("date.day.tuesday", [], "date"),
+            $this->translator->trans("date.day.wednesday", [], "date"),
+            $this->translator->trans("date.day.thursday", [], "date"),
+            $this->translator->trans("date.day.friday", [], "date"),
+            $this->translator->trans("date.day.saturday", [], "date"),
         ], $text);
 
         $text = ucfirst(str_replace([
             "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
         ], [
-            $trans->trans("date.day.sun", [], "date"),
-            $trans->trans("date.day.mon", [], "date"),
-            $trans->trans("date.day.tue", [], "date"),
-            $trans->trans("date.day.wed", [], "date"),
-            $trans->trans("date.day.thu", [], "date"),
-            $trans->trans("date.day.fri", [], "date"),
-            $trans->trans("date.day.sat", [], "date")
+            $this->translator->trans("date.day.sun", [], "date"),
+            $this->translator->trans("date.day.mon", [], "date"),
+            $this->translator->trans("date.day.tue", [], "date"),
+            $this->translator->trans("date.day.wed", [], "date"),
+            $this->translator->trans("date.day.thu", [], "date"),
+            $this->translator->trans("date.day.fri", [], "date"),
+            $this->translator->trans("date.day.sat", [], "date")
         ], $text));
 
         return $text;
