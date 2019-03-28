@@ -11,16 +11,19 @@ namespace Mikoweb\SymfonyUtilityBundle\EventListener;
 
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Mikoweb\SymfonyUtilityBundle\Entity\EntityFactory;
 
-class EntityProvidersSubscriber implements EventSubscriber, ContainerAwareInterface
+class EntityProvidersSubscriber implements EventSubscriber
 {
     /**
-     * @var ContainerInterface
+     * @var EntityFactory
      */
-    private $container;
+    protected $entityFactory;
+
+    public function __construct(EntityFactory $entityFactory)
+    {
+        $this->entityFactory = $entityFactory;
+    }
 
     /**
      * {@inheritdoc}
@@ -51,16 +54,8 @@ class EntityProvidersSubscriber implements EventSubscriber, ContainerAwareInterf
         $this->getEntityFactory()->aware($args->getEntity());
     }
 
-    /**
-     * @param ContainerInterface|null $container
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
-
     public function getEntityFactory(): EntityFactory
     {
-        return $this->container->get('symfony_utility.entity_factory');
+        return $this->entityFactory;
     }
 }

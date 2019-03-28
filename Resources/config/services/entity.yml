@@ -5,8 +5,8 @@ services:
             - '@Mikoweb\SymfonyUtilityBundle\Entity\Provider\UrlProvider'
 
     Mikoweb\SymfonyUtilityBundle\EventListener\EntityProvidersSubscriber:
-        calls:
-            - [setContainer, ['@service_container']]
+        arguments:
+            - '@Mikoweb\SymfonyUtilityBundle\Entity\EntityFactory'
         tags:
             - { name: doctrine.event_subscriber, connection: default }
 
