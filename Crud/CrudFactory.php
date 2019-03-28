@@ -14,6 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Mikoweb\SymfonyUtility\Crud\CrudableInterface;
 use Mikoweb\SymfonyUtility\Crud\CrudFactoryInterface;
 use Mikoweb\SymfonyUtility\Crud\CrudInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CrudFactory implements ContainerAwareInterface, CrudFactoryInterface
 {
@@ -21,6 +22,16 @@ class CrudFactory implements ContainerAwareInterface, CrudFactoryInterface
      * @var ContainerInterface
      */
     protected $container;
+
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
 
     /**
      * {@inheritdoc}
@@ -50,7 +61,7 @@ class CrudFactory implements ContainerAwareInterface, CrudFactoryInterface
         }
 
         /** @var CrudInterface $crud */
-        $crud = new $class();
+        $crud = new $class($this->translator);
         $crud->setContainer($this->container);
         $crud->setRelated($object);
 

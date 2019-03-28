@@ -23,6 +23,7 @@ use Mikoweb\SymfonyUtility\Crud\CrudInterface;
 use Mikoweb\SymfonyUtility\Crud\DataEvent;
 use Mikoweb\SymfonyUtility\Crud\DataInterface;
 use Mikoweb\SymfonyUtility\Manager\ControllerManagerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class CrudAbstract implements CrudInterface
 {
@@ -39,6 +40,11 @@ abstract class CrudAbstract implements CrudInterface
     protected $related;
 
     /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
      * @var OptionsResolver
      */
     private $optionsResolver;
@@ -48,8 +54,10 @@ abstract class CrudAbstract implements CrudInterface
      */
     private $options;
 
-    public function __construct()
+    public function __construct(TranslatorInterface $translator)
     {
+        $this->translator = $translator;
+
         $this->options = [];
         $resolver = new OptionsResolver();
         $this->optionsResolver = $resolver;
@@ -134,8 +142,7 @@ abstract class CrudAbstract implements CrudInterface
     {
         $name = empty($this->options['message_prefix']) ? $id : ($this->options['message_prefix'] . '.' . $id);
 
-        return $this->container->get('translator')->trans($name, $this->options['message_parameters'],
-            $this->options['message_domain']);
+        return $this->translator->trans($name, $this->options['message_parameters'], $this->options['message_domain']);
     }
 
     /**

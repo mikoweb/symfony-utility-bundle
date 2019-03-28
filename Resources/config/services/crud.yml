@@ -1,5 +1,7 @@
 services:
     Mikoweb\SymfonyUtilityBundle\Crud\CrudFactory:
+        arguments:
+            - '@Symfony\Contracts\Translation\TranslatorInterface'
         calls:
             - [setContainer, ['@service_container']]
 
