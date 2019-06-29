@@ -275,7 +275,6 @@ class CrudLoader extends Loader implements ContainerAwareInterface
         $route = new Route('/{id}');
         $route->setMethods(['GET']);
         $route->setDefault('_controller', $options['controller'] . ':show');
-        $route->setRequirement('id', '\d+');
 
         return $route;
     }
@@ -290,7 +289,6 @@ class CrudLoader extends Loader implements ContainerAwareInterface
         $route = new Route('/{id}/edit');
         $route->setMethods(['GET']);
         $route->setDefault('_controller', $options['controller'] . ':edit');
-        $route->setRequirement('id', '\d+');
 
         return $route;
     }
@@ -305,7 +303,6 @@ class CrudLoader extends Loader implements ContainerAwareInterface
         $route = new Route('/{id}/update');
         $route->setMethods(['POST']);
         $route->setDefault('_controller', $options['controller'] . ':update');
-        $route->setRequirement('id', '\d+');
 
         return $route;
     }
@@ -320,7 +317,6 @@ class CrudLoader extends Loader implements ContainerAwareInterface
         $route = new Route('/{id}/destroy');
         $route->setMethods(['GET', 'POST']);
         $route->setDefault('_controller', $options['controller'] . ':destroy');
-        $route->setRequirement('id', '\d+');
 
         return $route;
     }
