@@ -62,7 +62,7 @@ class RESTFormService
         $view = $form->createView();
 
         if ($addValid === true) {
-            $data[$this->getValidAttr()] = $form->isValid();
+            $data[$this->getValidAttr()] = $form->isSubmitted() && $form->isValid();
         }
 
         if ($addErrors === true) {
