@@ -41,6 +41,10 @@ class CrudLoader extends Loader implements ContainerAwareInterface
      */
     public function load($resource, $type = null)
     {
+        if (is_string($resource) && strlen($resource) > 0 && !in_array($resource[0], ['@', '/'])) {
+            $resource = $this->container->getParameter('kernel.project_dir') . '/config/resources/routing/' . $resource;
+        }
+
         $collection = new RouteCollection();
         $this->includeResource($collection, $resource);
 
@@ -117,6 +121,9 @@ class CrudLoader extends Loader implements ContainerAwareInterface
     protected function includeResource(RouteCollection $collection, $resource): void
     {
         switch (pathinfo($resource, PATHINFO_EXTENSION)) {
+            case 'yaml':
+                $collection->addCollection($this->import($resource, 'yaml'));
+                break;
             case 'yml':
                 $collection->addCollection($this->import($resource, 'yaml'));
                 break;
